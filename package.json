@@ -1,0 +1,18 @@
+{
+  "name": "ceviwie-chilbi-pos",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:butler": "npm run start -w @ceviwie/chilbi-butler",
+    "dev:pos": "npm run start -w @ceviwie/chilbi-pos",
+    "build:butler": "npm run make -w @ceviwie/chilbi-butler",
+    "build:pos": "npm run make -w @ceviwie/chilbi-pos",
+    "build:all": "npm run make --workspaces --if-present"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
+  }
+}

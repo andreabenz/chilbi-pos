@@ -2,9 +2,7 @@
   "eslint.format.enable": true,
   "editor.formatOnSave": true,
   "editor.rulers": [100],
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
+  "editor.codeActionsOnSave": {},
   "[javascript]": {
     "editor.codeActionsOnSave": {
       "source.organizeImports": "never",

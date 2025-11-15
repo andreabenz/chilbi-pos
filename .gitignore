@@ -139,3 +139,27 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Editor configurations that should be tracked
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# IntelliJ IDEA - ignore most, track shared configs
+.idea/*
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+!.idea/runConfigurations/
+!.idea/.gitignore
+!.idea/vcs.xml
+
+# Personal workspace settings
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/shelf/
+
+# Build and cache
+*.iml
+.idea_modules/
+

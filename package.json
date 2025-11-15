@@ -17,6 +17,7 @@
     "lint": "eslint --fix packages/*"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.5",
     "concurrently": "^9.2.1",
     "electron": "^39.2.0",
     "prettier": "^3.6.2",

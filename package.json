@@ -14,7 +14,7 @@
     "build:pos": "npm run build:shared && npm run make -w ceviwie-chilbi-pos",
     "build:all": "npm run build:shared && npm run make --workspaces --if-present",
     "build:shared": "npm run build -w @ceviwie/chilbi-shared",
-    "lint": "eslint --fix packages/*"
+    "lint": "biome check"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.5",

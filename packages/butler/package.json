@@ -1,6 +1,6 @@
 {
-  "name": "@ceviwie/chilbi-butler",
-  "productName": "chilbi-butler",
+  "name": "ceviwie-chilbi-butler",
+  "productName": "Cevi WIE Chilbi Bestellungsdisplay",
   "version": "1.0.0",
   "description": "Order display manager app. Dual-display for clients and staff.",
   "main": ".vite/build/main.js",
@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "clean": "rm -rf out"
   },
   "keywords": [],
   "authors": [

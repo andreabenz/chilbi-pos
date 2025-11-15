@@ -1,6 +1,6 @@
 {
-  "name": "@ceviwie/chilbi-pos",
-  "productName": "chilbi-pos",
+  "name": "ceviwie-chilbi-pos",
+  "productName": "Cevi WIE Chilbi Kassensystem",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "clean": "rm -rf out"
   },
   "keywords": [],
   "authors": [

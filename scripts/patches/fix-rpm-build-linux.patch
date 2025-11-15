@@ -1,0 +1,11 @@
+--- node_modules/electron-installer-redhat/resources/spec.ejs
++++ node_modules/electron-installer-redhat/resources/spec.ejs
+@@ -24,7 +24,7 @@
+ 
+ %install
+ mkdir -p %{buildroot}/usr/
+-cp <%= process.platform === 'darwin' ? '-R' : '-r' %> usr/* %{buildroot}/usr/
++cp <%= process.platform === 'darwin' ? '-R' : '-r' %> ../usr/. %{buildroot}/usr/
+ 
+ %files
+ %defattr(-, root, root, -)

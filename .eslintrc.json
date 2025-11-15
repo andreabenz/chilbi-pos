@@ -10,8 +10,20 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended",
     "plugin:import/electron",
-    "plugin:import/typescript"
+    "plugin:import/typescript",
+    "prettier"
   ],
+  "plugins": ["prettier"],
   "parser": "@typescript-eslint/parser",
-  "ignorePatterns": ["**/dist", "**/node_modules", "**/out", "**/.vite"]
+  "ignorePatterns": ["**/dist", "**/node_modules", "**/out", "**/.vite"],
+  "rules": {
+    "prettier/prettier": "warn",
+    "import/order": [
+      "warn",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+        "alphabetize": { "order": "asc" }
+      }
+    ]
+  }
 }

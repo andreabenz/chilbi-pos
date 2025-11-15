@@ -30,8 +30,11 @@ repos:
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: end-of-file-fixer
+        exclude: \.patch$
       - id: trailing-whitespace
+        exclude: \.patch$
       - id: mixed-line-ending
+        exclude: \.patch$
       - id: check-yaml
       - id: check-json
 

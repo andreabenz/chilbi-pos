@@ -13,12 +13,14 @@
     "build:butler": "npm run build:shared && npm run make -w ceviwie-chilbi-butler",
     "build:pos": "npm run build:shared && npm run make -w ceviwie-chilbi-pos",
     "build:all": "npm run build:shared && npm run make --workspaces --if-present",
-    "build:shared": "npm run build -w @ceviwie/chilbi-shared"
+    "build:shared": "npm run build -w @ceviwie/chilbi-shared",
+    "lint": "eslint --fix packages/*"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
     "electron": "^39.2.0",
+    "eslint": "^8.57.1",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.3"
+    "typescript": "~5.1.0"
   }
 }

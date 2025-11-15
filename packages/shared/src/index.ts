@@ -1,1 +1,1 @@
-export { defineConfig as defineForgeConfig } from "./forge-config";
+export { defineConfig as defineForgeConfig } from './forge-config';

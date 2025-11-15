@@ -1,8 +1,8 @@
-import { defineForgeConfig } from "@ceviwie/chilbi-shared";
+import { defineForgeConfig } from '@ceviwie/chilbi-shared';
 
 const config = defineForgeConfig({
   packagerConfig: {
-    executableName: "ceviwie-chilbi-butler",
+    executableName: 'ceviwie-chilbi-butler',
   },
 });
 

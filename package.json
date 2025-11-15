@@ -1,17 +1,23 @@
 {
-  "name": "ceviwie-chilbi-pos",
+  "name": "ceviwie-chilbi",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
   "scripts": {
-    "dev:butler": "npm run start -w @ceviwie/chilbi-butler",
-    "dev:pos": "npm run start -w @ceviwie/chilbi-pos",
-    "build:butler": "npm run make -w @ceviwie/chilbi-butler",
-    "build:pos": "npm run make -w @ceviwie/chilbi-pos",
-    "build:all": "npm run make --workspaces --if-present"
+    "dev:butler": "concurrently \"npm run dev:shared\" \"npm run start -w ceviwie-chilbi-butler\"",
+    "dev:pos": "concurrently \"npm run dev:shared\" \"npm run start -w ceviwie-chilbi-pos\"",
+    "dev:shared": "npm run dev -w @ceviwie/chilbi-shared",
+    "build:butler": "npm run build:shared && npm run make -w ceviwie-chilbi-butler",
+    "build:pos": "npm run build:shared && npm run make -w ceviwie-chilbi-pos",
+    "build:all": "npm run build:shared && npm run make --workspaces --if-present",
+    "build:shared": "npm run build -w @ceviwie/chilbi-shared"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
+    "electron": "^39.2.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
   }

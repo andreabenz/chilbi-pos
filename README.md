@@ -6,7 +6,7 @@ Point-of-Sales für Cevi WIE Chilbi.
 
 First make sure you meet these requirements:
 
-- Use **NodeJS v20**. This is important. Newer versions break Electron. You can use
+- Use **NodeJS v22**. This is important. Newer versions break Electron. You can use
   [`fnm`](https://github.com/Schniz/fnm) if you want an easy way to manage multiple NodeJS versions.
 - Install `prek`: https://prek.j178.dev/installation/. Then enable in repository by running
   `prek install`. This runs pre-commit hooks when you commit new changes.

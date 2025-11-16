@@ -3,6 +3,12 @@
   "editor.formatOnSave": true,
   "editor.rulers": [100],
   "editor.codeActionsOnSave": {},
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "tsconfig.json": "tsconfig.*.json, env.d.ts",
+    "vite.config.*": "jsconfig*, vitest.config.*, cypress.config.*, playwright.config.*",
+    "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .eslint*, eslint*, .oxlint*, oxlint*, .prettier*, prettier*, .editorconfig"
+  },
   // Set up Biome as default formatter for the following languages
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome",

@@ -1,1 +1,1 @@
-export { defineConfig as defineForgeConfig } from './forge-config';
+// Define your shared code here

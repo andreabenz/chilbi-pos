@@ -1,18 +1,27 @@
-# Cevi WIE Chilbi `shared` Module
+# Cevi WIE Chilbi Shared Library
 
-Add shared functionality between POS and Butler.
+A shared library package for the Chilbi POS project.
 
-To do so, add to `package.json` `exports` array like so:
+## Development
 
-```json
-// package.json
-{
-  // ...
-  "exports": {
-    ".": "./src/index.js",
-    "./types": "./src/types/index.js",
-    "./utils": "./src/utils/index.js",
-    "./components": "./src/components/index.js"
-  }
-}
+This package is built using [tsdown](https://tsdown.vercel.app/).
+
+The following NPM scripts will help you get started:
+
+| Script         | Description                                         |
+| -------------- | --------------------------------------------------- |
+| **build**      | Builds and packages the library.                    |
+| **dev**        | Builds and packages with file watching (hot reload) |
+| **test**       | Runs library tests                                  |
+| **test:watch** | Runs library tests with file watching (hot reload)  |
+| **typecheck**  | Checks types in library                             |
+
+## Usage
+
+Import shared utilities and types from this package:
+
+```typescript
+import { ... } from '@ceviwie/chilbi-shared';
 ```
+
+Your editor should provide import intellisense/autocomplete for the package.

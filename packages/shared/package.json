@@ -1,34 +1,38 @@
 {
   "name": "@ceviwie/chilbi-shared",
-  "version": "1.0.0",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared library code for Chilbi programs",
+  "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
   },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "electron-vite": "^4.0.1",
     "lodash": "^4.17.21",
-    "typescript": "~5.1.0"
+    "vitest": "^4.0.9"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.10.2",
-    "@electron-forge/maker-deb": "^7.10.2",
-    "@electron-forge/maker-rpm": "^7.10.2",
-    "@electron-forge/maker-squirrel": "^7.10.2",
-    "@electron-forge/maker-zip": "^7.10.2",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
-    "@electron-forge/plugin-fuses": "^7.10.2",
-    "@electron-forge/plugin-vite": "^7.10.2",
-    "@types/lodash": "^4.17.20"
+    "@types/lodash": "^4.17.20",
+    "@types/node": "^24.10.1",
+    "bumpp": "^10.3.1",
+    "tsdown": "^0.16.4",
+    "typescript": "~5.9.0",
+    "vitest": "^4.0.9"
   }
 }

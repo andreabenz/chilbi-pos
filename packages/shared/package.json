@@ -6,6 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.mjs",
+    "./ui": "./dist/ui/index.mjs",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.mjs",
@@ -22,6 +23,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@primeuix/themes": "^1.2.5",
     "@vitejs/plugin-vue": "^6.0.1",
     "electron-vite": "^4.0.1",
     "lodash": "^4.17.21",

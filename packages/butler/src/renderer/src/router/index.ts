@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import ElectronVite from '@/views/Home.vue';
+import Home from '@/views/Kitchensink.vue';
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -7,12 +7,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: ElectronVite,
-    },
-    {
-      path: '/example',
-      name: 'example',
-      component: () => import('../views/Example.vue'),
+      component: Home,
     },
   ],
 });

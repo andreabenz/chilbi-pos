@@ -16,16 +16,10 @@ const ipcHandle = () => window.api.ping();
   </div>
   <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
   <div class="actions">
-    <ButtonLink
-      href="https://electron-vite.org/"
-      target="_blank"
-      rel="noreferrer"
-      :external="true"
+    <ButtonLink href="https://electron-vite.org/" target="_blank" rel="noreferrer" :external="true"
       >Documentationf</ButtonLink
     >
-    <ButtonLink target="_blank" rel="noreferrer" @click="ipcHandle">
-      Send IPC
-    </ButtonLink>
+    <ButtonLink target="_blank" rel="noreferrer" @click="ipcHandle"> Send IPC </ButtonLink>
 
     <ButtonLink href="/example">Example page</ButtonLink>
   </div>

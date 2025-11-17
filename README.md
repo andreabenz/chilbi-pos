@@ -38,16 +38,7 @@ Recommended editors/IDEs: VS Code, IntelliJ IDEA or WebStorm, or Zed.
 
 For ease of development, set up your editor with plugins/support for the following tools:
 
-- BiomeJS
+- Eslint
 - Prettier
 
-Then set up the formatters for various languages:
-
-- **BiomeJS:** Use for JS/TS, HTML, CSS (not SCSS or Sass), JSON, JSONC, Vue, GraphQL
-- **Prettier:** Use for SCSS, Sass, YAML, Markdown
-
-## Linting
-
-We are using BiomeJS as our linter and formatter of choice. This might be a bit opinionated, and
-it's still in development, but it's 10-100x faster than traditional methods like ESLint. You might
-encounter some bugs here and there, so be weary.
+Prettier should be able to handle most languages used in this codebase.

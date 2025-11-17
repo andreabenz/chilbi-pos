@@ -14,44 +14,39 @@
     "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
     ".prettierrc.*": ".prettierignore"
   },
-  // Set up Biome as default formatter for the following languages
   "[javascript]": {
-    "editor.defaultFormatter": "biomejs.biome",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
-      "source.organizeImports": "never",
-      "source.sortImports": "never",
-      "source.fixAll.biome": "explicit",
-      "source.organizeImports.biome": "explicit"
+      "source.organizeImports": "explicit",
+      "source.sortImports": "explicit",
+      "source.fixAll.eslint": "explicit",
     }
   },
   "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
-      "source.organizeImports": "never",
-      "source.sortImports": "never",
-      "source.fixAll.biome": "explicit",
-      "source.organizeImports.biome": "explicit"
+      "source.organizeImports": "explicit",
+      "source.sortImports": "explicit",
+      "source.fixAll.eslint": "explicit",
     }
   },
   "[vue]": {
-    "editor.defaultFormatter": "biomejs.biome",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
-      "source.organizeImports": "never",
-      "source.sortImports": "never",
-      "source.fixAll.biome": "explicit",
-      "source.organizeImports.biome": "explicit"
+      "source.organizeImports": "explicit",
+      "source.sortImports": "explicit",
+      "source.fixAll.eslint": "explicit",
     }
   },
   "[json]": {
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[html]": {
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[css]": {
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  // Set up Prettier as the default formatter for the following languages
   "[scss]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -63,5 +58,6 @@
   },
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

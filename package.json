@@ -7,8 +7,8 @@
     ]
   },
   "scripts": {
-    "dev:butler": "concurrently \"npm run dev -w ceviwie-chilbi-butler\" \"npm run dev -w @ceviwie/chilbi-shared\"",
-    "dev:pos": "concurrently \"npm run dev -w ceviwie-chilbi-pos\" \"npm run dev -w @ceviwie/chilbi-shared\"",
+    "dev:butler": "concurrently \"npm run dev -w ceviwie-chilbi-butler\" \"sleep 2; npm run dev -w @ceviwie/chilbi-shared\"",
+    "dev:pos": "concurrently \"npm run dev -w ceviwie-chilbi-pos\" \"sleep 2; npm run dev -w @ceviwie/chilbi-shared\"",
     "dev:shared": "npm run dev -w @ceviwie/chilbi-shared",
     "build:butler": "npm run build:shared && npm run build -w ceviwie-chilbi-butler",
     "build:pos": "npm run build:shared && npm run build -w ceviwie-chilbi-pos",

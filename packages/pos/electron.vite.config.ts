@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
 
@@ -7,7 +8,7 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
     resolve: {
       alias: {
-        '@main': resolve('src/main'),
+        '@main': resolve(__dirname, 'src/main'),
       },
     },
   },
@@ -15,16 +16,16 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
     resolve: {
       alias: {
-        '@preload': resolve('src/preload'),
+        '@preload': resolve(__dirname, 'src/preload'),
       },
     },
   },
   renderer: {
     resolve: {
       alias: {
-        '@': resolve('src/renderer/src'),
+        '@': resolve(__dirname, 'src/renderer/src'),
       },
     },
-    plugins: [vue()],
+    plugins: [vue(), tailwindcss()],
   },
 });

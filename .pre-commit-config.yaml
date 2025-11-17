@@ -26,9 +26,9 @@ repos:
     hooks:
       - id: eslint
         name: eslint
-        entry: eslint --cache --fix
+        entry: npx eslint --cache --fix
         language: system
-        types: [javascript, jsx, ts, tsx]
+        types_or: [javascript, jsx, ts, tsx, vue]
         files: \.(js|jsx|ts|tsx|vue)$
         pass_filenames: true
 

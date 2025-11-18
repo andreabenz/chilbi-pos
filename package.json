@@ -7,13 +7,13 @@
     ]
   },
   "scripts": {
-    "dev:butler": "concurrently \"npm run dev -w ceviwie-chilbi-butler\" \"sleep 2; npm run dev -w @ceviwie/chilbi-shared\"",
-    "dev:pos": "concurrently \"npm run dev -w ceviwie-chilbi-pos\" \"sleep 2; npm run dev -w @ceviwie/chilbi-shared\"",
-    "dev:shared": "npm run dev -w @ceviwie/chilbi-shared",
-    "build:butler": "npm run build:shared && npm run build -w ceviwie-chilbi-butler",
-    "build:pos": "npm run build:shared && npm run build -w ceviwie-chilbi-pos",
-    "build:all": "npm run build:shared && npm run build --workspaces --if-present",
-    "build:shared": "npm run build -w @ceviwie/chilbi-shared",
+    "dev:butler": "pnpm --filter ceviwie-chilbi-butler dev",
+    "dev:pos": "concurrently \"pnpm --filter @ceviwie/chilbi-shared build && pnpm --filter ceviwie-chilbi-pos dev\" \"sleep 5; pnpm --filter @ceviwie/chilbi-shared dev\"",
+    "dev:shared": "pnpm --filter @ceviwie/chilbi-shared dev",
+    "build:butler": "pnpm run build:shared && pnpm --filter ceviwie-chilbi-butler build",
+    "build:pos": "pnpm run build:shared && pnpm --filter ceviwie-chilbi-pos build",
+    "build:all": "pnpm run build:shared && pnpm -r --if-present build",
+    "build:shared": "pnpm --filter @ceviwie/chilbi-shared build",
     "lint": "eslint --cache .",
     "lint:fix": "eslint --cache --fix ."
   },
@@ -30,6 +30,7 @@
     "vue-eslint-parser": "^10.2.0"
   },
   "dependencies": {
-    "@ceviwie/chilbi-shared": "*"
-  }
+    "@ceviwie/chilbi-shared": "workspace:*"
+  },
+  "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c"
 }

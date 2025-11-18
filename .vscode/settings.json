@@ -3,7 +3,7 @@
   "editor.formatOnSave": true,
   "editor.rulers": [100],
   "editor.codeActionsOnSave": {},
-  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.enabled": false,
   "explorer.fileNesting.patterns": {
     "*.ts": "${capture}.js",
     "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",

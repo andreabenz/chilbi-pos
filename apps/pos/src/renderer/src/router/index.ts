@@ -1,5 +1,5 @@
+import Main from '@/views/Main.vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
-import Home from '@/views/Kitchensink.vue';
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -7,7 +7,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: Main,
     },
   ],
 });

@@ -1,7 +1,7 @@
-import { resolve } from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   main: {
@@ -11,6 +11,9 @@ export default defineConfig({
         '@main': resolve(__dirname, 'src/main'),
       },
     },
+    optimizeDeps: {
+      exclude: ['@ceviwie/chilbi-shared'],
+    },
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
@@ -18,6 +21,9 @@ export default defineConfig({
       alias: {
         '@preload': resolve(__dirname, 'src/preload'),
       },
+    },
+    optimizeDeps: {
+      exclude: ['@ceviwie/chilbi-shared'],
     },
   },
   renderer: {
@@ -27,5 +33,8 @@ export default defineConfig({
       },
     },
     plugins: [vue(), tailwindcss()],
+    optimizeDeps: {
+      exclude: ['@ceviwie/chilbi-shared'],
+    },
   },
 });

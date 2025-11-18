@@ -49,7 +49,7 @@
   },
   "productName": "Chilbi Bestelldisplay",
   "dependencies": {
-    "@ceviwie/chilbi-shared": "^0.0.0",
+    "@ceviwie/chilbi-shared": "workspace:*",
     "@primeuix/themes": "^1.2.5",
     "@tailwindcss/vite": "^4.1.17",
     "primevue": "^4.4.1"

@@ -5,8 +5,8 @@
   "description": "Shared library code for Chilbi programs",
   "type": "module",
   "exports": {
-    ".": "./dist/index.mjs",
-    "./ui": "./dist/ui/index.mjs",
+    ".": "./src/index.ts",
+    "./ui": "./src/ui/index.ts",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.mjs",
@@ -36,5 +36,12 @@
     "tsdown": "^0.16.4",
     "typescript": "~5.9.0",
     "vitest": "^4.0.9"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./ui": "./dist/ui/index.mjs",
+      "./package.json": "./package.json"
+    }
   }
 }

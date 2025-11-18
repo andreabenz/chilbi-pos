@@ -14,13 +14,13 @@ First make sure you meet these requirements:
 Then, run:
 
 ```sh
-npm install
-npm run dev:pos  # Or dev:butler for the order display app
+pnpm install
+pnpm run dev:pos  # Or pnpm run dev:butler for the order display app
 ```
 
 This will launch the application in development mode.
 
-### NPM Scripts (Root)
+### PNPM Scripts (Root)
 
 | Script         | Description                                           |
 | -------------- | ----------------------------------------------------- |

@@ -14,6 +14,7 @@ repos:
       - id: mixed-line-ending
         exclude: \.patch$
       - id: check-yaml
+        exclude: pnpm-lock.yaml
 
   # Node.js/TypeScript
   - repo: https://github.com/pre-commit/mirrors-prettier

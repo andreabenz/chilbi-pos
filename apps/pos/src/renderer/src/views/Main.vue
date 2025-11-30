@@ -5,6 +5,6 @@ import { Splitter, SplitterPanel } from 'primevue';
 <template>
   <Splitter class="h-full">
     <SplitterPanel> Main Screen with categories and items </SplitterPanel>
-    <SplitterPanel :size="25" :min-size="25">Receipt and checkout</SplitterPanel>
+    <SplitterPanel :size="25" :min-size="25"> Receipt and checkout </SplitterPanel>
   </Splitter>
 </template>

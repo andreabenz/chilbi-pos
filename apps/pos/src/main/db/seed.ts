@@ -47,21 +47,21 @@ const drinksVariants: NonNullable<InitialSeedMenuItem['variants']> = [
  * various items. The actual ID is auto-generated when inserting into the database.
  */
 const extrasMap = Object.freeze({
-  pilze: { name: 'Pilze', price: 50 },
-  schinken: { name: 'Schinken', price: 100 },
-  salami: { name: 'Salami', price: 100 },
-  oliven: { name: 'Oliven', price: 50 },
-  peperoni: { name: 'Peperoni', price: 50 },
-  creme_fraiche: { name: 'Crème Fraîche', price: 50 },
-  speck: { name: 'Speck', price: 100 },
-  zwiebeln: { name: 'Zwiebeln', price: 50 },
-  zimt_und_zucker: { name: 'Zimt und Zucker', price: 50 },
-  nutella: { name: 'Nutella', price: 100 },
-  apfelmus: { name: 'Apfelmus', price: 100 },
-  banane: { name: 'Banane', price: 50 },
-  kaese: { name: 'Käse', price: 100 },
-  rahm: { name: 'Rahm', price: 0 },
-  zucker: { name: 'Zucker', price: 0 },
+  pilze: { name: 'Pilze', price: 50, iconUrl: '/icons/pilze.png' },
+  schinken: { name: 'Schinken', price: 100, iconUrl: '/icons/schinken.png' },
+  salami: { name: 'Salami', price: 100, iconUrl: '/icons/salami.png' },
+  oliven: { name: 'Oliven', price: 50, iconUrl: '/icons/oliven.png' },
+  peperoni: { name: 'Peperoni', price: 50, iconUrl: '/icons/peperoni.png' },
+  creme_fraiche: { name: 'Crème Fraîche', price: 50, iconUrl: '/icons/creme_fraiche.png' },
+  speck: { name: 'Speck', price: 100, iconUrl: '/icons/speck.png' },
+  zwiebeln: { name: 'Zwiebeln', price: 50, iconUrl: '/icons/zwiebeln.png' },
+  zimt_und_zucker: { name: 'Zimt und Zucker', price: 50, iconUrl: '/icons/zimt_und_zucker.png' },
+  nutella: { name: 'Nutella', price: 100, iconUrl: '/icons/nutella.png' },
+  apfelmus: { name: 'Apfelmus', price: 100, iconUrl: '/icons/apfelmus.png' },
+  banane: { name: 'Banane', price: 50, iconUrl: '/icons/banane.png' },
+  kaese: { name: 'Käse', price: 100, iconUrl: '/icons/kaese.png' },
+  rahm: { name: 'Rahm', price: 0, iconUrl: '/icons/rahm.png' },
+  zucker: { name: 'Zucker', price: 0, iconUrl: '/icons/zucker.png' },
 }) satisfies InitialSeedExtrasMap;
 
 // Factory methods
@@ -74,10 +74,14 @@ const extrasMap = Object.freeze({
  */
 const drink = (
   name: string,
-  options?: { variants?: InitialSeedMenuItem['variants']; extras?: InitialSeedExtras }
+  options?: {
+    variants?: InitialSeedMenuItem['variants'];
+    extras?: InitialSeedExtras;
+    icon?: string;
+  }
 ) =>
   ({
-    item: { name },
+    item: { name, iconUrl: options?.icon },
     variants: options?.variants ?? drinksVariants,
     extras: options?.extras,
   }) satisfies InitialSeedMenuItem;
@@ -89,9 +93,16 @@ const drink = (
  * @param options Additional options. Price is required.
  * @returns Pizza initial seed object
  */
-const pizza = (name: string, options: { price: number; extras?: InitialSeedExtras }) =>
+const pizza = (
+  name: string,
+  options: {
+    price: number;
+    extras?: InitialSeedExtras;
+    item?: Partial<InitialSeedMenuItem['item']>;
+  }
+) =>
   ({
-    item: { name },
+    item: { name, iconUrl: '/icons/pizza.png', ...options.item },
     variants: [{ price: options.price }], // Single variant without name => Uses menuItem.name
     extras:
       options.extras ??
@@ -116,6 +127,7 @@ const pizza = (name: string, options: { price: number; extras?: InitialSeedExtra
  */
 const crepe = (name: string, options: { price: number; extras?: InitialSeedExtras }) =>
   pizza(name, {
+    item: { iconUrl: '/icons/crepe.png' },
     extras: ['zimt_und_zucker', 'nutella', 'apfelmus', 'banane', 'schinken', 'kaese'],
     ...options,
   });
@@ -124,19 +136,20 @@ const initialSeedData: InitialSeedData = [
   {
     category: { name: 'Getränke' },
     menuItems: [
-      drink('Mineralwasser still'),
-      drink('Mineralwasser mit Kohlensäure'),
-      drink('Eistee Zitrone'),
-      drink('Eistee Pfirsich'),
-      drink('Rivella rot'),
-      drink('Coca-Cola'),
-      drink('Apfelschorle'),
-      drink('Citro'),
-      drink('Orangina'),
-      drink('Sirup'),
+      drink('Mineralwasser still', { icon: '/icons/water_still.png' }),
+      drink('Mineralwasser mit Kohlensäure', { icon: '/icons/water_sparkling.png' }),
+      drink('Eistee Zitrone', { icon: '/icons/ice_tea.png' }),
+      drink('Eistee Pfirsich', { icon: '/icons/ice_tea.png' }),
+      drink('Rivella rot', { icon: '/icons/rivella_red.png' }),
+      drink('Coca-Cola', { icon: '/icons/coca_cola.png' }),
+      drink('Apfelschorle', { icon: '/icons/schorle.png' }),
+      drink('Citro', { icon: '/icons/citro.png' }),
+      drink('Orangina', { icon: '/icons/orangina.png' }),
+      drink('Sirup', { icon: '/icons/sirup.png' }),
       drink('Kaffee', {
         variants: [{ price: 300 }],
         extras: ['rahm', 'zucker'],
+        icon: '/icons/coffee.png',
       }),
     ],
   },

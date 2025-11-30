@@ -35,7 +35,7 @@ export const menuItems = sqliteTable('menu_items', {
     .references(() => categories.id)
     .notNull(),
   name: text().notNull(),
-  thumbnailUrl: text(),
+  iconUrl: text(),
 });
 
 export const menuItemsRelations = relations(menuItems, ({ one, many }) => ({
@@ -76,6 +76,7 @@ export const extras = sqliteTable('extras', {
   id: int().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
   price: int().notNull(), // Price in Rappen
+  iconUrl: text(),
 });
 
 export const extrasRelations = relations(extras, ({ many }) => ({

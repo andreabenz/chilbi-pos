@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { join } from 'node:path';
 import icon from '../../resources/icon.png?asset';
+import { seedAll } from './db/seed';
 
 function createWindow(): void {
   // Create the browser window.
@@ -39,7 +40,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('org.ceviwie.chilbi-pos');
 
@@ -49,6 +50,10 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });
+
+  // Run seeds and migrations (and await, we don't want to start executing stuff if this is not yet
+  // initialized)
+  await seedAll();
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'));

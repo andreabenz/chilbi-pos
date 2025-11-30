@@ -6,6 +6,7 @@
 
 import { zip } from '@ceviwie/chilbi-shared/utils';
 import { env } from '@root/env';
+import { DrizzleQueryError, sql, Table } from 'drizzle-orm';
 import { db } from '.';
 import * as schema from './schema';
 
@@ -179,13 +180,23 @@ const initialSeedData: InitialSeedData = [
 ////////////////
 
 export async function seedInitial() {
-  // Truncate all databases
-  await Promise.all([
-    db.delete(schema.categories),
-    db.delete(schema.menuItems),
-    db.delete(schema.menuItemVariants),
-    db.delete(schema.extras),
-  ]);
+  // Truncate all databases. Run in transaction to avoid FK failures
+  await db.run(sql`PRAGMA foreign_keys = OFF`);
+
+  try {
+    await db.transaction(async tx => {
+      const truncate = async (table: Table) => {
+        await tx.delete(table);
+        await tx.run(sql`DELETE FROM sqlite_sequence WHERE name = '${table}';`);
+      };
+      await truncate(schema.categories);
+      await truncate(schema.menuItems);
+      await truncate(schema.menuItemVariants);
+      await truncate(schema.extras);
+    });
+  } finally {
+    await db.run(sql`PRAGMA foreign_keys = ON`);
+  }
 
   // Insert all extras and save in map for use when inserting items
   const extraIds = await db
@@ -253,5 +264,13 @@ export async function seedAll() {
     });
   }
 
-  return await Promise.all([seedInitial(), seedDev()]);
+  await Promise.all(seedPromises.map(fn => fn())).catch(err => {
+    if (err instanceof DrizzleQueryError) {
+      console.error('Failed to run SQL:', err.name, err.message);
+      console.table({ Cause: err.cause, Query: err.query, Params: err.params });
+    } else {
+      console.error('Error running seed script:', err);
+    }
+    process.exit(1);
+  });
 }

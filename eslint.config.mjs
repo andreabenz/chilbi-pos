@@ -1,7 +1,7 @@
 import eslintConfigPrettier from '@electron-toolkit/eslint-config-prettier';
 import tseslint from '@electron-toolkit/eslint-config-ts';
-import { defineConfig } from 'eslint/config';
 import eslintPluginVue from 'eslint-plugin-vue';
+import { defineConfig } from 'eslint/config';
 import vueParser from 'vue-eslint-parser';
 
 export default defineConfig(
@@ -36,6 +36,13 @@ export default defineConfig(
       ],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          varsIgnorePattern: '^_.*$',
+          argsIgnorePattern: '^_.*$',
+        },
+      ],
     },
   },
   eslintConfigPrettier

@@ -51,7 +51,10 @@
   "dependencies": {
     "@ceviwie/chilbi-shared": "workspace:*",
     "@primeuix/themes": "^1.2.5",
+    "@t3-oss/env-core": "^0.13.8",
     "@tailwindcss/vite": "^4.1.17",
     "primevue": "^4.4.1"
+    "dotenv": "^17.2.3",
+    "zod": "^4.1.13"
   }
 }

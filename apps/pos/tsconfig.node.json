@@ -9,7 +9,8 @@
     "playwright.config.*",
     "eslint.config.*",
     "src/main/**/*",
-    "src/preload/**/*"
+    "src/preload/**/*",
+    "src/env.ts",
   ],
   "compilerOptions": {
     "composite": true,

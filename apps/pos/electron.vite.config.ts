@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin({ exclude: ['@ceviwie/chilbi-shared'] })],
     resolve: {
       alias: {
         '@main': resolve(__dirname, 'src/main'),
@@ -14,7 +14,7 @@ export default defineConfig({
     },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin({ exclude: ['@ceviwie/chilbi-shared'] })],
     resolve: {
       alias: {
         '@preload': resolve(__dirname, 'src/preload'),

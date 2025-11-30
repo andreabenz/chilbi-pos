@@ -7,6 +7,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./ui": "./src/ui/index.ts",
+    "./utils": "./src/utils/index.ts",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.mjs",
@@ -41,6 +42,7 @@
     "exports": {
       ".": "./dist/index.mjs",
       "./ui": "./dist/ui/index.mjs",
+      "./utils": "./dist/utils/index.mjs",
       "./package.json": "./package.json"
     }
   }

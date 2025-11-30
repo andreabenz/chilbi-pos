@@ -11,6 +11,7 @@
     "src/main/**/*",
     "src/preload/**/*",
     "src/env.ts",
+    "drizzle.config.ts"
   ],
   "compilerOptions": {
     "composite": true,
@@ -18,6 +19,7 @@
     "types": ["electron-vite/node"],
     "paths": {
       "@main/*": ["./src/main/*"],
+      "@root/*": ["./src/*"],
       "@preload/*": ["./src/preload/*"]
     }
   }

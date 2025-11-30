@@ -1,7 +1,7 @@
-import { resolve } from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   main: {
@@ -9,6 +9,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@main': resolve(__dirname, 'src/main'),
+        '@root': resolve(__dirname, 'src'),
       },
     },
   },
@@ -17,6 +18,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@preload': resolve(__dirname, 'src/preload'),
+        '@root': resolve(__dirname, 'src'),
       },
     },
   },

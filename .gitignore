@@ -152,6 +152,7 @@ vite.config.ts.timestamp-*
 !.idea/runConfigurations/
 !.idea/.gitignore
 !.idea/vcs.xml
+.junie
 
 # Personal workspace settings
 .idea/workspace.xml

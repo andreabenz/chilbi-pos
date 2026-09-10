@@ -4,6 +4,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { join } from 'node:path';
 import icon from '../../resources/icon.png?asset';
 import { seedAll } from './db/seed';
+import { registerAllIpc } from './ipc';
 
 function createWindow(): void {
   // Create the browser window.
@@ -54,6 +55,9 @@ app.whenReady().then(async () => {
   // Run seeds and migrations (and await, we don't want to start executing stuff if this is not yet
   // initialized)
   await seedAll();
+
+  // Register IPC endpoints
+  registerAllIpc();
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'));

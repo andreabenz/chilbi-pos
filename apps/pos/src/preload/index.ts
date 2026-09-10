@@ -1,20 +1,17 @@
 import { electronAPI } from '@electron-toolkit/preload';
-import { contextBridge } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
+import type { MenuCategoryWithItems } from '../main/db/services/menuService';
+import type { CreateOrderInput, OrderResult } from '../main/db/services/orderService';
 
-type PreloadAPI = {
-  ping: () => void;
-};
-
-// Custom APIs for renderer
-const api: PreloadAPI = {
+const api = {
   ping: () => electronAPI.ipcRenderer.send('ping'),
+  getFullMenu: (): Promise<MenuCategoryWithItems[]> => ipcRenderer.invoke('menu:get-full'),
+  createOrder: (payload: CreateOrderInput): Promise<OrderResult> =>
+    ipcRenderer.invoke('order:create', payload),
 };
 
-export type { PreloadAPI };
+export type PreloadAPI = typeof api;
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI);

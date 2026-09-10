@@ -168,7 +168,10 @@ export const payments = sqliteTable('payments', {
   receiptNumber: int()
     .notNull()
     .references(() => bills.receiptNumber),
-  method: text().notNull().$type<'cash' | 'twint' | 'coupon'>().default('cash'),
+  method: text()
+    .notNull()
+    .$type<'cash' | 'twint' | 'coupon' | 'voucher' | 'helfer'>()
+    .default('cash'),
   amount: int().notNull(),
   tipAmount: int().notNull().default(0),
 });

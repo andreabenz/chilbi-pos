@@ -136,8 +136,8 @@ const initialSeedData: InitialSeedData = [
   {
     category: { name: 'Getränke' },
     menuItems: [
-      drink('Mineralwasser still', { icon: '/icons/water_still.png' }),
-      drink('Mineralwasser mit Kohlensäure', { icon: '/icons/water_sparkling.png' }),
+      drink('Mineral ohne', { icon: '/icons/water_still.png' }),
+      drink('Mineral mit', { icon: '/icons/water_sparkling.png' }),
       drink('Eistee Zitrone', { icon: '/icons/ice_tea.png' }),
       drink('Eistee Pfirsich', { icon: '/icons/ice_tea.png' }),
       drink('Rivella rot', { icon: '/icons/rivella_red.png' }),
@@ -172,18 +172,10 @@ const initialSeedData: InitialSeedData = [
     menuItems: [
       crepe('Crêpe Natur', { price: 550 }),
       crepe('Crêpe Schinken und Käse', { price: 750 }),
-      crepe('Crêpe Zimt und Zucket', { price: 600 }),
+      crepe('Crêpe Zimt und Zucker', { price: 600 }),
       crepe('Crêpe Nutella', { price: 650 }),
       crepe('Crêpe Nutella und Banane', { price: 700 }),
       crepe('Crêpe Apfelmus', { price: 650 }),
-    ],
-  },
-
-  {
-    category: { name: 'Feuer' },
-    menuItems: [
-      // TODO: Check if this category is even needed
-      // No items
     ],
   },
 ];

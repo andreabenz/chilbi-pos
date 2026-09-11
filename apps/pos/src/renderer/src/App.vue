@@ -2,15 +2,6 @@
 import { Divider } from 'primevue';
 import NavBar from './components/NavBar.vue';
 import Sidebar from './components/Sidebar.vue';
-import { useMenuStore } from './stores/menu';
-import { onMounted } from 'vue';
-
-const menuStore = useMenuStore();
-
-onMounted(async () => {
-  await menuStore.loadMenu();
-  console.log('Categories in store:', menuStore.categories);
-});
 </script>
 
 <template>

@@ -39,7 +39,7 @@ type InitialSeedData = Array<InitialSeedCategory>;
 const drinksVariants: NonNullable<InitialSeedMenuItem['variants']> = [
   { name: 'Klein (3 dL)', price: 300 },
   { name: 'Gross (5 dL)', price: 400 },
-  { name: 'Flasche (1.5 L)', price: 10000 },
+  { name: 'Flasche (1.5 L)', price: 1000 },
 ];
 
 /**

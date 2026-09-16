@@ -24,6 +24,10 @@ const displayPrice = computed(() => {
   return (minPrice.value / 100).toFixed(2);
 });
 
+const emit = defineEmits<{
+  selectVariant: [item: MenuItem];
+}>();
+
 function handleCardClick() {
   if (!isMultiVariant.value && props.item.variants[0]) {
     cartStore.addItem(
@@ -32,7 +36,7 @@ function handleCardClick() {
       []
     );
   } else {
-    // variant selection dialog
+    emit('selectVariant', props.item);
   }
 }
 </script>

@@ -2,8 +2,19 @@
 import { ProgressSpinner } from 'primevue';
 import { useMenuStore } from '../stores/menu';
 import ItemCard from './ItemCard.vue';
+import type { MenuCategory } from '../stores/menu';
+
+type MenuItem = MenuCategory['menuItems'][number];
 
 const menuStore = useMenuStore();
+
+const emit = defineEmits<{
+  selectVariant: [item: MenuItem];
+}>();
+
+function handleSelectVariant(item: MenuItem) {
+  emit('selectVariant', item);
+}
 </script>
 
 <template>
@@ -22,6 +33,7 @@ const menuStore = useMenuStore();
         :key="item.id"
         :item="item"
         :category-name="menuStore.currentCategory?.name"
+        @select-variant="handleSelectVariant"
       />
     </div>
   </div>

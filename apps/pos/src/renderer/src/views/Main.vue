@@ -4,8 +4,18 @@ import CategoryBar from '../components/CategoryBar.vue';
 import ItemGrid from '../components/ItemGrid.vue';
 import { onMounted } from 'vue';
 import { useMenuStore } from '../stores/menu';
+import { ref } from 'vue';
+import VariantSelectionDialog from '@/components/VariantSelectionDialog.vue';
+import type { MenuCategory } from '../stores/menu';
+
+type MenuItem = MenuCategory['menuItems'][number];
 
 const menuStore = useMenuStore();
+const variantDialogRef = ref();
+
+function handleSelectVariant(item: MenuItem) {
+  variantDialogRef.value.open(item);
+}
 
 onMounted(async () => {
   await menuStore.loadMenu();
@@ -21,7 +31,8 @@ onMounted(async () => {
   <Splitter class="h-full border-none">
     <SplitterPanel class="flex flex-col h-full overflow-hidden">
       <CategoryBar />
-      <ItemGrid />
+      <ItemGrid @select-variant="handleSelectVariant" />
+      <VariantSelectionDialog ref="variantDialogRef" />
     </SplitterPanel>
 
     <SplitterPanel

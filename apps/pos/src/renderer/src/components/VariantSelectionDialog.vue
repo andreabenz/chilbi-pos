@@ -38,7 +38,7 @@ defineExpose({ open });
       <Button
         v-for="variant in selectedItem?.variants"
         :key="variant.id"
-        class="flex-1 aspect-square"
+        class="flex-1 aspect-video"
         @click="selectVariant(variant)"
       >
         <div class="flex flex-col">

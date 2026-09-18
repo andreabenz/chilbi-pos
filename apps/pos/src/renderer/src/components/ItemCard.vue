@@ -20,10 +20,6 @@ const minPrice = computed(() => {
   return Math.min(...props.item.variants.map(variant => variant.price));
 });
 
-const displayPrice = computed(() => {
-  return (minPrice.value / 100).toFixed(2);
-});
-
 const emit = defineEmits<{
   selectVariant: [item: MenuItem];
 }>();
@@ -58,8 +54,8 @@ function handleCardClick() {
     </template>
 
     <template #footer>
-      <div class="flex justify-center text-center pt-0! pb-2!">
-        <span class="text-base font-bold text-gray-800 leading-snug">
+      <div class="flex justify-center text-center pt-0! pb-0!">
+        <span class="text-base font-bold text-black">
           {{ item.name.replace(/^(Crêpe|Pizza)\s/, '').replace(/ und /g, '/') }}
         </span>
       </div>

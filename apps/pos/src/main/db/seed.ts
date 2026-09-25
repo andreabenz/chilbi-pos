@@ -158,7 +158,7 @@ const initialSeedData: InitialSeedData = [
     category: { name: 'Pizza' },
     menuItems: [
       pizza('Pizza Simpel', { price: 1000 }),
-      pizza('Pizza Waldboden', { price: 12 }),
+      pizza('Pizza Waldboden', { price: 1200 }),
       pizza('Pizza Vegiboden', { price: 1150 }),
       pizza('Pizza Salami', { price: 1100 }),
       pizza('Pizza Brännt Bianca', { price: 1000 }),

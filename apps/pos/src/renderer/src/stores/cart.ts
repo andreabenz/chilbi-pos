@@ -5,6 +5,7 @@ export interface SelectedExtra {
   id: number;
   name: string;
   price: number;
+  iconUrl: string | null;
 }
 
 export interface CartItem {
@@ -109,6 +110,33 @@ export const useCartStore = defineStore('cart', () => {
     return maxDrink + maxFood;
   });
 
+  function updateItemExtras(cartItemId: string, newExtras: SelectedExtra[]) {
+    const index = items.value.findIndex(item => item.id === cartItemId);
+    if (index === -1) return;
+
+    const currentItem = items.value[index];
+    if (!currentItem) return;
+
+    const newExtraIds = newExtras.map(e => e.id);
+    const newId = generateCartItemId(currentItem.menuItemId, currentItem.variant.id, newExtraIds);
+    const newUnitPrice = currentItem.variant.price + newExtras.reduce((sum, e) => sum + e.price, 0);
+
+    const existingOtherIndex = items.value.findIndex(item => item.id === newId);
+
+    if (existingOtherIndex !== -1 && existingOtherIndex !== index) {
+      const existingItem = items.value[existingOtherIndex];
+
+      if (!existingItem) return;
+
+      existingItem.quantity += currentItem.quantity;
+      items.value.splice(index, 1);
+    } else {
+      currentItem.id = newId;
+      currentItem.extras = [...newExtras];
+      currentItem.unitPrice = newUnitPrice;
+    }
+  }
+
   return {
     items,
     subTotal,
@@ -119,5 +147,6 @@ export const useCartStore = defineStore('cart', () => {
     updateQuantity,
     removeItem,
     clearCart,
+    updateItemExtras,
   };
 });

@@ -170,7 +170,7 @@ export const payments = sqliteTable('payments', {
     .references(() => bills.receiptNumber),
   method: text()
     .notNull()
-    .$type<'cash' | 'twint' | 'coupon' | 'voucher' | 'helfer'>()
+    .$type<'cash' | 'twint' | 'coupon' | 'voucher' | 'helfer' | 'card '>()
     .default('cash'),
   amount: int().notNull(),
   tipAmount: int().notNull().default(0),

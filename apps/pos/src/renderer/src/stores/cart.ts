@@ -110,6 +110,14 @@ export const useCartStore = defineStore('cart', () => {
     return maxDrink + maxFood;
   });
 
+  const voucherDiscount = computed(() => {
+    const pizzaPrices = items.value
+      .filter(item => item.categoryName === 'Pizza')
+      .map(item => item.unitPrice);
+
+    return pizzaPrices.length > 0 ? Math.max(...pizzaPrices) : 0;
+  });
+
   function updateItemExtras(cartItemId: string, newExtras: SelectedExtra[]) {
     const index = items.value.findIndex(item => item.id === cartItemId);
     if (index === -1) return;
@@ -143,6 +151,7 @@ export const useCartStore = defineStore('cart', () => {
     totalItemsCount,
     isEmpty,
     couponDiscount,
+    voucherDiscount,
     addItem,
     updateQuantity,
     removeItem,

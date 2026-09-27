@@ -32,19 +32,28 @@ defineExpose({ open });
     :dismissable-mask="true"
     modal
     header="Grösse wählen"
-    :style="{ width: '90vw', maxWidth: '600px' }"
+    :style="{ width: 'auto', maxWidth: '90vw' }"
+    class="text-black!"
   >
     <div class="flex flex-row gap-3">
       <Button
         v-for="variant in selectedItem?.variants"
         :key="variant.id"
-        class="flex-1 aspect-video"
+        unstyled
+        :pt="{
+          root: {
+            class: [
+              'relative w-32 aspect-square rounded-2xl bg-white border-(--p-primary-color) p-1 cursor-pointer transition-all border-3',
+            ],
+          },
+          content: { class: 'flex h-full w-full flex-col items-center justify-center gap-0' },
+        }"
         @click="selectVariant(variant)"
       >
-        <div class="flex flex-col">
-          <span>{{ variant.name }}</span>
-          <span>CHF {{ (variant.price / 100).toFixed(2) }}</span>
-        </div>
+        <span class="text-base font-bold text-center text-black"> {{ variant.name }} </span>
+        <span class="text-base text-center text-black">
+          CHF {{ (variant.price / 100).toFixed(2) }}
+        </span>
       </Button>
     </div>
   </Dialog>

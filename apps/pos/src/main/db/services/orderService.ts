@@ -7,7 +7,7 @@ export interface CreateOrderItemInput {
 }
 
 export interface CreatePaymentInput {
-  method: 'cash' | 'twint' | 'coupon' | 'voucher' | 'helfer';
+  method: 'cash' | 'twint' | 'coupon' | 'voucher' | 'helfer' | 'card';
   amount: number;
   tipAmount?: number;
 }

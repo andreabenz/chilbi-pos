@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import icon from '../../resources/icon.png?asset';
 import { seedAll } from './db/seed';
 import { registerAllIpc } from './ipc';
+import { initPrinterLogo } from '../main/printer';
 
 function createWindow(): void {
   // Create the browser window.
@@ -58,6 +59,8 @@ app.whenReady().then(async () => {
 
   // Register IPC endpoints
   registerAllIpc();
+
+  await initPrinterLogo();
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'));

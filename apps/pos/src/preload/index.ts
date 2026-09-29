@@ -8,6 +8,7 @@ const api = {
   getFullMenu: (): Promise<MenuCategoryWithItems[]> => ipcRenderer.invoke('menu:get-full'),
   createOrder: (payload: CreateOrderInput): Promise<OrderResult> =>
     ipcRenderer.invoke('order:create', payload),
+  printOrder: (order: any) => ipcRenderer.invoke('printer:print-order', order),
 };
 
 export type PreloadAPI = typeof api;

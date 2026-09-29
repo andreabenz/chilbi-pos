@@ -11,11 +11,17 @@ import CartPanel from '@/components/CartPanel.vue';
 import ItemExtrasDialog from '@/components/ItemExtrasDialog.vue';
 import type { CartItem } from '@/stores/cart.ts';
 type MenuItem = MenuCategory['menuItems'][number];
+import CheckoutDialog from '@/components/CheckoutDialog.vue';
+import OrderSuccessDialog from '@/components/OrderSuccessDialog.vue';
+import { useCounterStore } from '@/stores/counter';
 
 const menuStore = useMenuStore();
+const counterStore = useCounterStore();
 
 const variantDialogRef = ref<InstanceType<typeof VariantSelectionDialog> | null>(null);
 const extrasDialogRef = ref<InstanceType<typeof ItemExtrasDialog> | null>(null);
+const checkoutDialogRef = ref<InstanceType<typeof CheckoutDialog> | null>(null);
+const successDialogRef = ref<InstanceType<typeof OrderSuccessDialog> | null>(null);
 
 function handleSelectVariant(item: MenuItem) {
   variantDialogRef.value?.open(item);
@@ -23,6 +29,15 @@ function handleSelectVariant(item: MenuItem) {
 
 function handleEditExtras(item: CartItem) {
   extrasDialogRef.value?.open(item);
+}
+
+function handleCheckout() {
+  checkoutDialogRef.value?.open();
+}
+
+function handleOrderCreated(result: { orderNumber: number; receiptNumber: number }) {
+  successDialogRef.value?.show(result.orderNumber);
+  counterStore.setCount(result.orderNumber + 1);
 }
 
 onMounted(async () => {
@@ -47,11 +62,13 @@ onMounted(async () => {
       :min-size="25"
       class="flex flex-col h-full bg-white border-l border-gray-200 overflow-hidden"
     >
-      <CartPanel @edit-extras="handleEditExtras" />
+      <CartPanel @edit-extras="handleEditExtras" @checkout="handleCheckout" />
     </SplitterPanel>
   </Splitter>
 
   <VariantSelectionDialog ref="variantDialogRef" />
   <ItemExtrasDialog ref="extrasDialogRef" />
+  <CheckoutDialog ref="checkoutDialogRef" @order-created="handleOrderCreated" />
+  <OrderSuccessDialog ref="successDialogRef" @order-created="handleOrderCreated" />
   <ConfirmDialog />
 </template>

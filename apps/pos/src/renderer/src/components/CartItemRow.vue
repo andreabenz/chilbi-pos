@@ -15,10 +15,10 @@ const emit = defineEmits<{ (e: 'edit-extras', item: CartItem): void }>();
   <div class="py-2 border-b">
     <div class="flex justify-between items-center">
       <div class="min-w-0">
-        <span class="font-bold text-sm text-black">
+        <span class="font-bold text-md text-black">
           {{ item.name }}
         </span>
-        <span v-if="item.variant?.name" class="text-sm text-gray-500 ml-1">
+        <span v-if="item.variant?.name" class="text-md text-gray-500 ml-1">
           {{ item.variant.name }}
         </span>
       </div>
@@ -39,40 +39,40 @@ const emit = defineEmits<{ (e: 'edit-extras', item: CartItem): void }>();
           icon="pi pi-pencil"
           severity="secondary"
           text
-          size="small"
-          class="w-6! h-6! shrink-0"
+          size="large"
+          class="w-8! h-8! shrink-0"
           @click="emit('edit-extras', item)"
         />
-        <span v-if="item.extras.length > 0" class="text-xs text-gray-800 truncate">
-          Extra: {{ item.extras.map(extra => extra.name).join(' · ') }}
+        <span v-if="item.extras.length > 0" class="text-sm text-gray-800 truncate">
+          Extras: {{ item.extras.map(extra => extra.name).join(' · ') }}
         </span>
-        <span v-else class="text-xs text-gray-400"> Extras hinzufügen </span>
+        <span v-else class="text-sm text-gray-500"> Extras hinzufügen </span>
       </div>
       <div v-else></div>
       <div class="flex items-center shrink-0">
         <Button
           icon="pi pi-minus"
           text
-          size="small"
-          class="w-7! h-7!"
+          size="large"
+          class="w-8! h-8!"
           @click="cartStore.updateQuantity(item.id, -1)"
         />
-        <span class="font-bold text-sm w-6 text-center">
+        <span class="font-bold text-md w-6 text-center">
           {{ item.quantity }}
         </span>
         <Button
           icon="pi pi-plus"
           text
-          size="small"
-          class="w-7! h-7!"
+          size="large"
+          class="w-8! h-8!"
           @click="cartStore.updateQuantity(item.id, 1)"
         />
         <Button
           icon="pi pi-trash"
           severity="danger"
           text
-          size="small"
-          class="w-7! h-7!"
+          size="large"
+          class="w-8! h-8! ml-2"
           @click="cartStore.removeItem(item.id)"
         />
       </div>

@@ -1,15 +1,23 @@
-// PC858 character byte mappings for Epson TM-T20II
+// PC858 character byte mappings
 const charMap: Record<string, number> = {
+  // Umlaute
   ä: 0x84,
   ö: 0x94,
   ü: 0x81,
   Ä: 0x8e,
   Ö: 0x99,
   Ü: 0x9a,
+  // French / Italian accents (lowercase)
   é: 0x82,
   è: 0x8a,
   à: 0x85,
   ê: 0x88,
+  // French / Italian accents (uppercase)
+  É: 0x90,
+  È: 0xd4,
+  Ê: 0xd2,
+  Ë: 0xeb,
+  // Punctuation & symbols
   '–': 0x2d, // en-dash -> '-'
   '—': 0x2d, // em-dash -> '-'
   '’': 0x27, // typographic apostrophe -> '''

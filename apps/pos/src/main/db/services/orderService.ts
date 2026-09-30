@@ -1,5 +1,6 @@
 import { db } from '../index';
 import * as schema from '../schema';
+import { desc } from 'drizzle-orm';
 
 export interface CreateOrderItemInput {
   menuItemId: number;
@@ -81,4 +82,14 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderResult>
       receiptNumber: bill.receiptNumber,
     };
   });
+}
+
+/**
+ * Returns the highest orderNumber in the database, or 0 if no orders exist yet.
+ */
+export async function getLatestOrderNumber(): Promise<number> {
+  const latestOrder = await db.query.orders.findFirst({
+    orderBy: [desc(schema.orders.orderNumber)],
+  });
+  return latestOrder ? latestOrder.orderNumber : 0;
 }

@@ -11,6 +11,7 @@ const api = {
   getFullMenu: (): Promise<MenuCategoryWithItems[]> => ipcRenderer.invoke('menu:get-full'),
   createOrder: (payload: CreateOrderInput): Promise<OrderResult> =>
     ipcRenderer.invoke('order:create', payload),
+  getLatestOrderNumber: (): Promise<number> => ipcRenderer.invoke('order:get-latest-number'),
 
   //Printer
   printOrder: (order: any) => ipcRenderer.invoke('printer:print-order', order),

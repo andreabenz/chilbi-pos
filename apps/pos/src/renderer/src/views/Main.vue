@@ -41,7 +41,7 @@ function handleOrderCreated(result: { orderNumber: number; receiptNumber: number
 }
 
 onMounted(async () => {
-  await menuStore.loadMenu();
+  await Promise.all([menuStore.loadMenu(), counterStore.initFromDb()]);
   console.log('Categories in store:', menuStore.categories);
   const firstCategory = menuStore.categories[0];
   if (firstCategory && !menuStore.selectedCategoryId) {

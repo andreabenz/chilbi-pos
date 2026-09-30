@@ -6,9 +6,12 @@ import { PrinterDevice } from '@main/printer/printerService';
 
 const api = {
   ping: () => electronAPI.ipcRenderer.send('ping'),
+
+  //Orders and Menu
   getFullMenu: (): Promise<MenuCategoryWithItems[]> => ipcRenderer.invoke('menu:get-full'),
   createOrder: (payload: CreateOrderInput): Promise<OrderResult> =>
     ipcRenderer.invoke('order:create', payload),
+
   //Printer
   printOrder: (order: any) => ipcRenderer.invoke('printer:print-order', order),
   listPrinters: (): Promise<PrinterDevice[]> => ipcRenderer.invoke('printer:list'),
@@ -16,6 +19,15 @@ const api = {
     ipcRenderer.invoke('printer:set-selected', name),
   testPrint: (): Promise<{ success: boolean; error?: string }> =>
     ipcRenderer.invoke('printer:test-print'),
+
+  //Admin
+  exportDatabase: (): Promise<{
+    success: boolean;
+    path?: string;
+    message?: string;
+    error?: string;
+  }> => ipcRenderer.invoke('admin:export-db'),
+  getRecentData: (): Promise<any[]> => ipcRenderer.invoke('admin:get-recent-data'),
 };
 
 export type PreloadAPI = typeof api;

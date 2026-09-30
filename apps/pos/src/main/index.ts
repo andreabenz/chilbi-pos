@@ -1,24 +1,34 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import 'dotenv/config';
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, shell } from 'electron';
 import { join } from 'node:path';
 import icon from '../../resources/icon.png?asset';
 import { seedAll } from './db/seed';
 import { registerAllIpc } from './ipc';
 import { initPrinterLogo } from '../main/printer';
+import { categories } from '@main/db/schema';
+import { db } from '@main/db';
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 900,
+    fullscreen: true,
+    kiosk: true,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon,
+    title: 'Chilbi POS',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
     },
+  });
+
+  globalShortcut.register('Escape', () => {
+    mainWindow.setKiosk(false);
+  });
+  globalShortcut.register('F', () => {
+    mainWindow.setKiosk(true);
   });
 
   mainWindow.on('ready-to-show', () => {
@@ -55,7 +65,10 @@ app.whenReady().then(async () => {
 
   // Run seeds and migrations (and await, we don't want to start executing stuff if this is not yet
   // initialized)
-  await seedAll();
+  const existing = await db.select().from(categories).limit(1);
+  if (existing.length === 0) {
+    await seedAll();
+  }
 
   // Register IPC endpoints
   registerAllIpc();

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ProgressSpinner } from 'primevue';
-import { useMenuStore } from '../stores/menu';
+import { useMenuStore } from '../../stores/menu';
 import ItemCard from './ItemCard.vue';
-import type { MenuCategory } from '../stores/menu';
+import type { MenuCategory } from '../../stores/menu';
 
 type MenuItem = MenuCategory['menuItems'][number];
 

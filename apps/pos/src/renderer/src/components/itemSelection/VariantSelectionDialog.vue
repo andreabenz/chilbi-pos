@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Dialog, Button } from 'primevue';
 import { ref } from 'vue';
-import { useCartStore } from '../stores/cart';
-import type { MenuCategory } from '../stores/menu';
+import { useCartStore } from '../../stores/cart';
+import type { MenuCategory } from '../../stores/menu';
 
 type MenuItem = MenuCategory['menuItems'][number];
 

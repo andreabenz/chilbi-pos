@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { Splitter, SplitterPanel, ConfirmDialog } from 'primevue';
-import CategoryBar from '../components/CategoryBar.vue';
-import ItemGrid from '../components/ItemGrid.vue';
+import CategoryBar from '../components/itemSelection/CategoryBar.vue';
+import ItemGrid from '../components/itemSelection/ItemGrid.vue';
 import { onMounted } from 'vue';
 import { useMenuStore } from '../stores/menu';
 import { ref } from 'vue';
-import VariantSelectionDialog from '@/components/VariantSelectionDialog.vue';
+import VariantSelectionDialog from '../components/itemSelection/VariantSelectionDialog.vue';
 import type { MenuCategory } from '../stores/menu';
-import CartPanel from '@/components/CartPanel.vue';
-import ItemExtrasDialog from '@/components/ItemExtrasDialog.vue';
+import CartPanel from '../components/cart/CartPanel.vue';
+import ItemExtrasDialog from '../components/itemSelection/ItemExtrasDialog.vue';
 import type { CartItem } from '@/stores/cart.ts';
 type MenuItem = MenuCategory['menuItems'][number];
-import CheckoutDialog from '@/components/CheckoutDialog.vue';
+import CheckoutDialog from '../components/checkout/CheckoutDialog.vue';
 import OrderSuccessDialog from '@/components/OrderSuccessDialog.vue';
 import { useCounterStore } from '@/stores/counter';
 

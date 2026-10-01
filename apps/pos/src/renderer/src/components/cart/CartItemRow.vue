@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Button } from 'primevue';
-import type { CartItem } from '../stores/cart';
-import { useCartStore } from '../stores/cart';
-import { useMenuStore } from '../stores/menu';
+import type { CartItem } from '../../stores/cart';
+import { useCartStore } from '../../stores/cart';
+import { useMenuStore } from '../../stores/menu';
 
 const cartStore = useCartStore();
 const menuStore = useMenuStore();

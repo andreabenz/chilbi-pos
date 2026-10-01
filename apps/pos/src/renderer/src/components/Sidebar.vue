@@ -93,7 +93,7 @@ onMounted(() => {
   </aside>
   <Drawer
     v-model:visible="isDrawerOpen"
-    header="Verwaltung"
+    header="Administration"
     position="left"
     :style="{ width: '320px' }"
   >

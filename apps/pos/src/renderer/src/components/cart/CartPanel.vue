@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Button } from 'primevue';
 import { useConfirm } from 'primevue/useconfirm';
-import { useCartStore } from '../stores/cart';
-import type { CartItem } from '../stores/cart';
-import CartItemRow from '@/components/CartItemRow.vue';
-import { useCounterStore } from '@/stores/counter.ts';
+import { useCartStore } from '../../stores/cart';
+import type { CartItem } from '../../stores/cart';
+import CartItemRow from './CartItemRow.vue';
+import { useCounterStore } from '../../stores/counter';
 
 const cartStore = useCartStore();
 const counterStore = useCounterStore();

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Dialog, Button, ToggleButton } from 'primevue';
 import { ref } from 'vue';
-import { useCartStore } from '../stores/cart';
-import { useMenuStore } from '../stores/menu';
-import type { CartItem, SelectedExtra } from '../stores/cart';
+import { useCartStore } from '../../stores/cart';
+import { useMenuStore } from '../../stores/menu';
+import type { CartItem, SelectedExtra } from '../../stores/cart';
 
 const cartStore = useCartStore();
 const menuStore = useMenuStore();

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from 'primevue';
-import { useMenuStore } from '../stores/menu';
+import { useMenuStore } from '../../stores/menu';
 
 const menuStore = useMenuStore();
 </script>

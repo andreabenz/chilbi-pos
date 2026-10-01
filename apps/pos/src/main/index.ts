@@ -16,6 +16,8 @@ function createWindow(): void {
     kiosk: true,
     show: false,
     autoHideMenuBar: true,
+    height: 720,
+    width: 1280,
     icon,
     title: 'Chilbi POS',
     webPreferences: {

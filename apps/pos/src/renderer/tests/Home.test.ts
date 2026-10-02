@@ -1,21 +1,24 @@
-import { mount, RouterLinkStub } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
+import { createPinia } from 'pinia';
+import PrimeVue from 'primevue/config';
+import ConfirmationService from 'primevue/confirmationservice';
 import { beforeEach, describe, expect, it } from 'vitest';
-import Home from '@/views/Home.vue';
+import Main from '@/views/Main.vue';
 
-describe('Home', () => {
+describe('Main View', () => {
   beforeEach(() => {
-    // Mock window.electron
-    window.electron = {
-      process: { platform: '', versions: {}, env: {} },
+    window.api = {
+      getFullMenu: async () => [],
+      getLatestOrderNumber: async () => 0,
+      listPrinters: async () => [],
+      setSelectedPrinter: async () => ({ success: true }),
     } as any;
   });
 
-  it('renders', () => {
-    const wrapper = mount(Home, {
+  it('mounts successfully', () => {
+    const wrapper = mount(Main, {
       global: {
-        stubs: {
-          RouterLink: RouterLinkStub,
-        },
+        plugins: [createPinia(), PrimeVue, ConfirmationService],
       },
     });
     expect(wrapper.exists()).toBe(true);

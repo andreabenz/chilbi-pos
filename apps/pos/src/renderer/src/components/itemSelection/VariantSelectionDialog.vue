@@ -7,19 +7,28 @@ import type { MenuCategory } from '../../stores/menu';
 type MenuItem = MenuCategory['menuItems'][number];
 
 const cartStore = useCartStore();
-
 const visible = ref(false);
 const selectedItem = ref<MenuItem | null>(null);
+const selectedCategoryName = ref<string | undefined>(undefined);
 
-function open(item: MenuItem) {
+function open(item: MenuItem, categoryName?: string) {
   selectedItem.value = item;
+  selectedCategoryName.value = categoryName;
   visible.value = true;
 }
 
 function selectVariant(variant: MenuItem['variants'][number]) {
   if (!selectedItem.value) return;
 
-  cartStore.addItem(selectedItem.value, variant, []);
+  cartStore.addItem(
+    {
+      id: selectedItem.value.id,
+      name: selectedItem.value.name,
+      categoryName: selectedCategoryName.value,
+    },
+    variant,
+    []
+  );
   visible.value = false;
 }
 

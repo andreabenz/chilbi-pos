@@ -24,7 +24,7 @@ const checkoutDialogRef = ref<InstanceType<typeof CheckoutDialog> | null>(null);
 const successDialogRef = ref<InstanceType<typeof OrderSuccessDialog> | null>(null);
 
 function handleSelectVariant(item: MenuItem) {
-  variantDialogRef.value?.open(item);
+  variantDialogRef.value?.open(item, menuStore.currentCategory?.name);
 }
 
 function handleEditExtras(item: CartItem) {

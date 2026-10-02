@@ -171,14 +171,28 @@ async function handleSubmit() {
     tipAmount?: number;
   }[] = [];
 
-  if (discountType.value === 'voucher' || discountType.value === 'helfer') {
-    payments.push({ method: discountType.value, amount: cartStore.subTotal });
+  if (discountType.value === 'helfer') {
+    payments.push({ method: 'helfer', amount: cartStore.subTotal });
     if (tipAmount.value > 0) {
       payments.push({ method: paymentMethod.value, amount: 0, tipAmount: tipAmount.value });
     }
+  } else if (discountType.value === 'voucher') {
+    const voucherVal = cartStore.voucherDiscount;
+    if (voucherVal > 0) {
+      payments.push({ method: 'voucher', amount: voucherVal });
+    }
+    if (totalDue.value > 0 || tipAmount.value > 0) {
+      payments.push({
+        method: paymentMethod.value,
+        amount: totalDue.value,
+        tipAmount: tipAmount.value,
+      });
+    }
   } else if (discountType.value === 'coupon') {
     const couponVal = cartStore.couponDiscount;
-    if (couponVal > 0) payments.push({ method: 'coupon', amount: couponVal });
+    if (couponVal > 0) {
+      payments.push({ method: 'coupon', amount: couponVal });
+    }
     if (totalDue.value > 0 || tipAmount.value > 0) {
       payments.push({
         method: paymentMethod.value,
@@ -217,7 +231,7 @@ async function handleSubmit() {
       subtotal: cartStore.subTotal,
       discount: discountAmount.value,
       finalTotal: totalDueWithTip.value,
-      paymentMethod: paymentMethod.value,
+      paymentMethod: discountType.value === 'helfer' ? 'helfer' : paymentMethod.value,
     });
 
     visible.value = false;

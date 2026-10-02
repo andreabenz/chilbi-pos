@@ -4,6 +4,9 @@ import type { MenuCategoryWithItems } from '../main/db/services/menuService';
 import type { CreateOrderInput, OrderResult } from '../main/db/services/orderService';
 import type { PrinterDevice } from '../main/printer/printerService';
 
+/**
+ * Preload API object exposing IPC methods securely to the renderer process.
+ */
 const api = {
   ping: () => electronAPI.ipcRenderer.send('ping'),
 

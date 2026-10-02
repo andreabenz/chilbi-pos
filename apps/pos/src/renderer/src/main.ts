@@ -8,6 +8,10 @@ import App from './App.vue';
 import router from './router';
 import './assets/main.css';
 
+/**
+ * Main Vue 3 renderer application entrypoint.
+ * Configures Pinia, Vue Router, PrimeVue with Cevi theme, and confirmation service.
+ */
 const app = createApp(App);
 
 app.use(createPinia());

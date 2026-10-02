@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
+/**
+ * Representation of an extra/topping attached to a cart item.
+ */
 export interface SelectedExtra {
   id: number;
   name: string;
@@ -8,6 +11,9 @@ export interface SelectedExtra {
   iconUrl: string | null;
 }
 
+/**
+ * Line item in the shopping cart with variant, selected extras, and quantity.
+ */
 export interface CartItem {
   id: string;
   menuItemId: number;
@@ -23,15 +29,24 @@ export interface CartItem {
   unitPrice: number;
 }
 
+/**
+ * Pinia store managing POS cart state, item additions, quantity modifications, extras, and discounts.
+ */
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([]);
 
+  /**
+   * Generates a unique composite line identifier based on item, variant, and sorted extras.
+   */
   function generateCartItemId(menuItemId: number, variantId: number, extraIds: number[]): string {
     const sortedExtraIds = [...extraIds].sort((a, b) => a - b);
 
     return `${menuItemId}-${variantId}-${sortedExtraIds.join('-')}`;
   }
 
+  /**
+   * Adds an item variant with optional extras to the cart or increments existing line quantity.
+   */
   function addItem(
     menuItem: { id: number; name: string; categoryName?: string },
     variant: { id: number; name: string | null; price: number },
@@ -66,6 +81,9 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
+  /**
+   * Updates line quantity by delta; removes line if resulting quantity is below 1.
+   */
   function updateQuantity(cartItemId: string, delta: number) {
     const index = items.value.findIndex(item => item.id === cartItemId);
 
@@ -118,6 +136,9 @@ export const useCartStore = defineStore('cart', () => {
     return pizzaPrices.length > 0 ? Math.max(...pizzaPrices) : 0;
   });
 
+  /**
+   * Updates extras for an existing cart item and adjusts unit prices / line deduplication.
+   */
   function updateItemExtras(cartItemId: string, newExtras: SelectedExtra[]) {
     const index = items.value.findIndex(item => item.id === cartItemId);
     if (index === -1) return;

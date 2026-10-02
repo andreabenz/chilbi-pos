@@ -1,13 +1,21 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
+
+/**
+ * Menu category data structure returned by preload getFullMenu.
+ */
 export type MenuCategory = Awaited<ReturnType<typeof window.api.getFullMenu>>[number];
 
+/**
+ * Pinia store managing menu categories, items, and active category selection.
+ */
 export const useMenuStore = defineStore('menu', () => {
   const isLoading = ref(false);
   const categories = ref<MenuCategory[]>([]);
   const selectedCategoryId = ref<number | null>(null);
   const error = ref<string | null>(null);
 
+  /** Fetches the full menu hierarchy from the database via IPC. */
   async function loadMenu() {
     isLoading.value = true;
     error.value = null;

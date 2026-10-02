@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
+/**
+ * Pinia store managing the active order sequence number displayed on the POS interface.
+ */
 export const useCounterStore = defineStore('counter', () => {
   const count = ref(1);
 
@@ -11,6 +14,7 @@ export const useCounterStore = defineStore('counter', () => {
     count.value = num;
   }
 
+  /** Loads the highest existing order number from the SQLite database and sets the counter to next. */
   async function initFromDb() {
     try {
       const latestOrderNumber = await window.api.getLatestOrderNumber();

@@ -9,6 +9,9 @@ import { initPrinterLogo } from '../main/printer';
 import { categories } from '@main/db/schema';
 import { db } from '@main/db';
 
+/**
+ * Creates and configures the main Electron browser window in kiosk mode.
+ */
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({

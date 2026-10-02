@@ -5,6 +5,11 @@ import { sql } from 'drizzle-orm';
 import { db } from '../index';
 import * as schema from '../schema';
 
+/**
+ * Creates a complete SQLite database backup file in the userData/backups directory using VACUUM INTO.
+ *
+ * @returns Path to the newly created backup file
+ */
 async function createBackup(): Promise<string> {
   const backupDir = path.join(app.getPath('userData'), 'backups');
   fs.mkdirSync(backupDir, { recursive: true });
@@ -17,6 +22,11 @@ async function createBackup(): Promise<string> {
   return backupPath;
 }
 
+/**
+ * Creates a safety backup, deletes all records from all tables, and resets auto-increment sequences.
+ *
+ * @returns Object containing the created backup file path
+ */
 export async function wipeAndResetDatabase(): Promise<{ backupPath: string }> {
   const backupPath = await createBackup();
 

@@ -7,6 +7,14 @@ const THRESHOLD = 180;
 let cachedLogoBuffer: Buffer | null = null;
 let cachedLogoPath: string | null = null;
 
+/**
+ * Encodes 1-bit monochrome raw pixel buffer into ESC/POS GS ( L raster graphics commands.
+ *
+ * @param pixels 1-channel raw thresholded pixel buffer
+ * @param width Image width in pixels
+ * @param height Image height in pixels
+ * @returns ESC/POS graphics command buffer
+ */
 function createGraphicsCommand(pixels: Buffer, width: number, height: number): Buffer {
   const bytesPerRow = Math.ceil(width / 8);
   const rasterData = Buffer.alloc(bytesPerRow * height);
@@ -65,6 +73,12 @@ function createGraphicsCommand(pixels: Buffer, width: number, height: number): B
   return Buffer.concat([storeGraphicsCommand, printGraphicsCommand]);
 }
 
+/**
+ * Loads an SVG file, converts it to monochrome 1-bit bitmap using sharp, and encodes it into ESC/POS.
+ *
+ * @param svgPath Filesystem path to the SVG file
+ * @returns ESC/POS raster graphics command buffer
+ */
 export async function rasterizeLogo(svgPath: string): Promise<Buffer> {
   const svgBuffer = fs.readFileSync(svgPath);
 
@@ -94,6 +108,11 @@ export async function rasterizeLogo(svgPath: string): Promise<Buffer> {
   return createGraphicsCommand(data, info.width, info.height);
 }
 
+/**
+ * Rasterizes and caches the SVG logo for future receipt printing.
+ *
+ * @param svgPath Filesystem path to the SVG logo
+ */
 export async function initializeLogo(svgPath: string): Promise<void> {
   if (cachedLogoBuffer && cachedLogoPath === svgPath) {
     return;
@@ -103,6 +122,11 @@ export async function initializeLogo(svgPath: string): Promise<void> {
   cachedLogoPath = svgPath;
 }
 
+/**
+ * Returns the in-memory cached ESC/POS rasterized logo buffer.
+ *
+ * @returns Cached logo command buffer or null if not yet initialized
+ */
 export function getCachedLogo(): Buffer | null {
   return cachedLogoBuffer;
 }

@@ -2,11 +2,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Button, Dialog, Select, Divider, Drawer } from 'primevue';
+import { useConfirm } from 'primevue/useconfirm';
+import { useCounterStore } from '../stores/counter';
 
 interface PrinterOption {
   name: string;
   isDefault?: boolean;
 }
+
+const confirm = useConfirm();
+const counterStore = useCounterStore();
+
+const isDeletingOrder = ref(false);
+const isWipingDb = ref(false);
 
 const isDrawerOpen = ref(false);
 
@@ -74,6 +82,59 @@ async function handleShowRecentData() {
   }
 }
 
+async function handleDeleteLatestOrder() {
+  confirm.require({
+    header: 'Letzte Bestellung stornieren',
+    message: 'Möchtest du die letzte Bestellung wirklich unwiderruflich löschen?',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Bestätigen',
+    rejectLabel: 'Abbrechen',
+    acceptClass: '!bg-red-600 !border-red-600 !text-white !rounded-xl',
+    rejectClass: '!rounded-xl',
+    accept: async () => {
+      isDeletingOrder.value = true;
+      try {
+        const result = await window.api.deleteLatestOrder();
+        if (result.success) {
+          counterStore.setCount(result.nextOrderNumber);
+        } else {
+          alert(result.message || 'Fehler beim Stornieren der Bestellung.');
+        }
+      } catch (err) {
+        console.error('Delete order failed:', err);
+      } finally {
+        isDeletingOrder.value = false;
+      }
+    },
+  });
+}
+
+async function handleWipeDatabase() {
+  confirm.require({
+    header: 'Datenbank komplett zurücksetzen',
+    message: 'Möchtest du wirklich alle Daten unwiderruflich löschen?',
+    icon: 'pi pi-trash',
+    acceptLabel: 'Bestätigen',
+    rejectLabel: 'Abbrechen',
+    acceptClass: '!bg-red-600 !border-red-600 !text-white !rounded-xl',
+    rejectClass: '!rounded-xl',
+    accept: async () => {
+      isWipingDb.value = true;
+      try {
+        const result = await window.api.wipeDatabase();
+        if (result.success) {
+          await window.api.relaunchApp();
+        } else {
+          alert(`Fehler beim Zurücksetzen: ${result.error}`);
+        }
+      } catch (err) {
+        console.error('Wipe DB failed:', err);
+      } finally {
+        isWipingDb.value = false;
+      }
+    },
+  });
+}
 onMounted(() => {
   loadPrinters();
 });
@@ -144,6 +205,24 @@ onMounted(() => {
             class="!rounded-xl"
             :loading="isLoadingData"
             @click="handleShowRecentData"
+          />
+          <Button
+            label="Letzte Bestellung stornieren"
+            icon="pi pi-undo"
+            severity="warn"
+            variant="outlined"
+            class="!rounded-xl"
+            :loading="isDeletingOrder"
+            @click="handleDeleteLatestOrder"
+          />
+          <Button
+            label="Datenbank zurücksetzen"
+            icon="pi pi-trash"
+            severity="danger"
+            variant="outlined"
+            class="!rounded-xl"
+            :loading="isWipingDb"
+            @click="handleWipeDatabase"
           />
         </div>
       </div>

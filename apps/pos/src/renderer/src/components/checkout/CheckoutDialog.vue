@@ -165,21 +165,32 @@ async function handleSubmit() {
   if (!isOrderValid.value || isSubmitting.value) return;
   isSubmitting.value = true;
 
-  const payments: { method: 'cash' | 'card' | 'voucher' | 'helfer' | 'coupon'; amount: number }[] =
-    [];
+  const payments: {
+    method: 'cash' | 'card' | 'voucher' | 'helfer' | 'coupon';
+    amount: number;
+    tipAmount?: number;
+  }[] = [];
 
   if (discountType.value === 'voucher' || discountType.value === 'helfer') {
     payments.push({ method: discountType.value, amount: cartStore.subTotal });
+    if (tipAmount.value > 0) {
+      payments.push({ method: paymentMethod.value, amount: 0, tipAmount: tipAmount.value });
+    }
   } else if (discountType.value === 'coupon') {
     const couponVal = cartStore.couponDiscount;
     if (couponVal > 0) payments.push({ method: 'coupon', amount: couponVal });
-    if (totalDueWithTip.value > 0) {
-      payments.push({ method: paymentMethod.value, amount: totalDueWithTip.value });
+    if (totalDue.value > 0 || tipAmount.value > 0) {
+      payments.push({
+        method: paymentMethod.value,
+        amount: totalDue.value,
+        tipAmount: tipAmount.value,
+      });
     }
   } else {
     payments.push({
       method: paymentMethod.value,
-      amount: totalDueWithTip.value,
+      amount: totalDue.value,
+      tipAmount: tipAmount.value,
     });
   }
 

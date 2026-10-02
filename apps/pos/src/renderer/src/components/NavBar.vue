@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ceviLogo from '../../../main/assets/Logo_Cevi-WIE_2019_web.svg';
+import ceviLogo from '../assets/Logo_Cevi-WIE_2019_web.svg';
 </script>
 
 <template>

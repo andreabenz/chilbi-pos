@@ -26,6 +26,8 @@ function createWindow(): void {
     },
   });
 
+  app.requestSingleInstanceLock();
+
   globalShortcut.register('Escape', () => {
     mainWindow.setKiosk(false);
   });

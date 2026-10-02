@@ -1,13 +1,14 @@
-import { dialog, ipcMain } from 'electron';
+import { app, dialog, ipcMain } from 'electron';
 import { desc } from 'drizzle-orm';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { db } from '../db';
 import * as schema from '../db/schema';
+import { wipeAndResetDatabase } from '@main/db/services/adminService';
 
 export function registerAdminIpc(): void {
   /**
-   * 1. Export SQLite database file to a user-chosen destination
+   * Export SQLite database file to a user-chosen destination
    */
   ipcMain.handle('admin:export-db', async () => {
     try {
@@ -40,7 +41,7 @@ export function registerAdminIpc(): void {
   });
 
   /**
-   * 2. Fetch latest 20 database entries with all joined relations
+   * Fetch the latest 20 database entries with all joined relations
    */
   ipcMain.handle('admin:get-recent-data', async () => {
     try {
@@ -64,5 +65,25 @@ export function registerAdminIpc(): void {
       console.error('[AdminIPC] Failed to fetch recent data:', error);
       throw error;
     }
+  });
+  /**
+   * Wipes database, creates backup, and returns result
+   */
+  ipcMain.handle('admin:wipe-db', async () => {
+    try {
+      const result = await wipeAndResetDatabase();
+      return { success: true, backupPath: result.backupPath };
+    } catch (error) {
+      console.error('[AdminIPC] DB wipe failed:', error);
+      return { success: false, error: String(error) };
+    }
+  });
+
+  /**
+   * Relaunches the Electron application (or closes it)
+   */
+  ipcMain.handle('app:relaunch', () => {
+    app.relaunch();
+    app.exit(0);
   });
 }

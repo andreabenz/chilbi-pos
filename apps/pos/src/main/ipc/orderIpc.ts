@@ -1,5 +1,10 @@
 import { ipcMain } from 'electron';
-import { createOrder, CreateOrderInput, getLatestOrderNumber } from '../db/services/orderService';
+import {
+  createOrder,
+  CreateOrderInput,
+  deleteLatestOrder,
+  getLatestOrderNumber,
+} from '../db/services/orderService';
 
 export function registerOrderIpc(): void {
   ipcMain.handle('order:create', async (_event, payload: CreateOrderInput) => {
@@ -16,6 +21,14 @@ export function registerOrderIpc(): void {
     } catch (error) {
       console.error('Failed to get latest order number:', error);
       return 0;
+    }
+  });
+  ipcMain.handle('order:delete-latest', async () => {
+    try {
+      return await deleteLatestOrder();
+    } catch (error) {
+      console.error('[OrderIPC] deleteLatestOrder failed:', error);
+      return { success: false, message: String(error) };
     }
   });
 }

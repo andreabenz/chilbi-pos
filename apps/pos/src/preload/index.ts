@@ -2,7 +2,7 @@ import { electronAPI } from '@electron-toolkit/preload';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { MenuCategoryWithItems } from '../main/db/services/menuService';
 import type { CreateOrderInput, OrderResult } from '../main/db/services/orderService';
-import { PrinterDevice } from '@main/printer/printerService';
+import type { PrinterDevice } from '../main/printer/printerService';
 
 const api = {
   ping: () => electronAPI.ipcRenderer.send('ping'),
@@ -12,6 +12,10 @@ const api = {
   createOrder: (payload: CreateOrderInput): Promise<OrderResult> =>
     ipcRenderer.invoke('order:create', payload),
   getLatestOrderNumber: (): Promise<number> => ipcRenderer.invoke('order:get-latest-number'),
+  deleteLatestOrder: (): Promise<
+    | { success: true; deletedOrderNumber: number; nextOrderNumber: number }
+    | { success: false; message: string }
+  > => ipcRenderer.invoke('order:delete-latest'),
 
   //Printer
   printOrder: (order: any) => ipcRenderer.invoke('printer:print-order', order),
@@ -29,6 +33,9 @@ const api = {
     error?: string;
   }> => ipcRenderer.invoke('admin:export-db'),
   getRecentData: (): Promise<any[]> => ipcRenderer.invoke('admin:get-recent-data'),
+  wipeDatabase: (): Promise<{ success: boolean; backupPath?: string; error?: string }> =>
+    ipcRenderer.invoke('admin:wipe-db'),
+  relaunchApp: (): Promise<void> => ipcRenderer.invoke('app:relaunch'),
 };
 
 export type PreloadAPI = typeof api;

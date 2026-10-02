@@ -1,6 +1,6 @@
 import { db } from '../index';
 import * as schema from '../schema';
-import { desc } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 
 export interface CreateOrderItemInput {
   menuItemId: number;
@@ -92,4 +92,62 @@ export async function getLatestOrderNumber(): Promise<number> {
     orderBy: [desc(schema.orders.orderNumber)],
   });
   return latestOrder ? latestOrder.orderNumber : 0;
+}
+
+/**
+ * Deletes the latest order and returns the deleted order number and the next order number.
+ */
+export async function deleteLatestOrder(): Promise<
+  | { success: true; deletedOrderNumber: number; nextOrderNumber: number }
+  | { success: false; message: string }
+> {
+  return db.transaction(async tx => {
+    const latestOrder = await tx.query.orders.findFirst({
+      orderBy: [desc(schema.orders.orderNumber)],
+      with: { bill: true },
+    });
+
+    if (!latestOrder) {
+      return { success: false as const, message: 'Keine Bestellungen vorhanden' };
+    }
+
+    if (latestOrder.bill) {
+      const { receiptNumber } = latestOrder.bill;
+      await tx.delete(schema.payments).where(eq(schema.payments.receiptNumber, receiptNumber));
+      await tx.delete(schema.bills).where(eq(schema.bills.receiptNumber, receiptNumber));
+    }
+
+    await tx
+      .delete(schema.orderItems)
+      .where(eq(schema.orderItems.orderNumber, latestOrder.orderNumber));
+
+    await tx.delete(schema.orders).where(eq(schema.orders.orderNumber, latestOrder.orderNumber));
+
+    await tx.run(
+      sql`UPDATE sqlite_sequence
+          SET seq = (SELECT COALESCE(MAX(${schema.orders.orderNumber}), 0) FROM ${schema.orders})
+          WHERE name = 'orders'`
+    );
+    await tx.run(
+      sql`UPDATE sqlite_sequence
+          SET seq = (SELECT COALESCE(MAX(${schema.bills.receiptNumber}), 0) FROM ${schema.bills})
+          WHERE name = 'bills'`
+    );
+
+    const [row] = await tx
+      .select({
+        max: sql<number>`COALESCE(MAX(
+        ${schema.orders.orderNumber}
+        ),
+        0
+        )`,
+      })
+      .from(schema.orders);
+
+    return {
+      success: true as const,
+      deletedOrderNumber: latestOrder.orderNumber,
+      nextOrderNumber: (row?.max ?? 0) + 1,
+    };
+  });
 }

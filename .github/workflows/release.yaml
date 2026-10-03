@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       # Version kommt aus "packageManager" in der Root-package.json
       # (z. B. "packageManager": "pnpm@9.15.9"). Falls das Feld fehlt: `version: 9` ergänzen.

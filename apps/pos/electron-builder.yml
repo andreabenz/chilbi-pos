@@ -2,6 +2,12 @@ appId: org.ceviwie.chilbi-pos
 productName: Chilbi Kassensystem
 directories:
   buildResources: build
+  output: dist
+extraResources:
+  - from: drizzle
+    to: drizzle
+    filter:
+      - '**/*'
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -11,13 +17,30 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+  - '**/*.node'
+  - '**/*.dll'
+  - '**/node_modules/sharp/**'
+  - '**/node_modules/@img/**'
+  - '**/node_modules/@libsql/**'
+  - '**/node_modules/libsql/**'
+  - '**/node_modules/@lastapp/node-printer/**'
+
 win:
   executableName: ceviwie-chilbi-pos
+  target:
+    - target: nsis
+      arch:
+        - x64
 nsis:
+  perMachine: false
+  allowElevation: false
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -41,5 +64,6 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  owner: andreabenz
+  repo: chilbi-pos

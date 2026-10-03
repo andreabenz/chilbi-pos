@@ -1,22 +1,42 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import 'dotenv/config';
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, globalShortcut, ipcMain, shell } from 'electron';
 import { join } from 'node:path';
 import icon from '../../resources/icon.png?asset';
 import { seedAll } from './db/seed';
+import { registerAllIpc } from './ipc';
+import { initPrinterLogo } from '../main/printer';
+import { categories } from '@main/db/schema';
+import { db } from '@main/db';
+import { runMigrations } from '@main/db/migrator';
 
+/**
+ * Creates and configures the main Electron browser window in kiosk mode.
+ */
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 900,
+    fullscreen: true,
+    kiosk: true,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    height: 720,
+    width: 1280,
+    icon,
+    title: 'Chilbi POS',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
     },
+  });
+
+  app.requestSingleInstanceLock();
+
+  globalShortcut.register('Escape', () => {
+    mainWindow.setKiosk(false);
+  });
+  globalShortcut.register('F', () => {
+    mainWindow.setKiosk(true);
   });
 
   mainWindow.on('ready-to-show', () => {
@@ -51,9 +71,32 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  // Run seeds and migrations (and await, we don't want to start executing stuff if this is not yet
-  // initialized)
-  await seedAll();
+  try {
+    await runMigrations();
+  } catch (err) {
+    console.error('[Database] Migration failed:', err);
+    dialog.showErrorBox(
+      'Datenbankfehler',
+      `Die Datenbank-Initialisierung ist fehlgeschlagen:\n\n${err instanceof Error ? err.message : String(err)}`
+    );
+    app.quit();
+    return;
+  }
+
+  try {
+    const existing = await db.select().from(categories).limit(1);
+    if (existing.length === 0) {
+      console.info('[Database] Empty database detected. Running initial seed...');
+      await seedAll();
+    }
+  } catch (err) {
+    console.error('[Database] Seeding check failed:', err);
+  }
+
+  // Register IPC endpoints
+  registerAllIpc();
+
+  await initPrinterLogo();
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'));
@@ -78,3 +121,15 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+process.on('uncaughtException', error => {
+  console.error('[Main Process Uncaught Exception]:', error);
+  dialog.showErrorBox(
+    'Schwerwiegender Systemfehler',
+    `Die Kassen-Software hat einen Fehler festgestellt:\n\n${error.message}`
+  );
+});
+
+process.on('unhandledRejection', reason => {
+  console.error('[Main Process Unhandled Rejection]:', reason);
+});

@@ -6,7 +6,7 @@
 
 import { zip } from '@ceviwie/chilbi-shared/utils';
 import { env } from '@root/env';
-import { DrizzleQueryError, sql, Table } from 'drizzle-orm';
+import { DrizzleQueryError, sql } from 'drizzle-orm';
 import { db } from '.';
 import * as schema from './schema';
 
@@ -39,7 +39,7 @@ type InitialSeedData = Array<InitialSeedCategory>;
 const drinksVariants: NonNullable<InitialSeedMenuItem['variants']> = [
   { name: 'Klein (3 dL)', price: 300 },
   { name: 'Gross (5 dL)', price: 400 },
-  { name: 'Flasche (1.5 L)', price: 10000 },
+  { name: 'Flasche (1.5 L)', price: 1000 },
 ];
 
 /**
@@ -136,16 +136,18 @@ const initialSeedData: InitialSeedData = [
   {
     category: { name: 'Getränke' },
     menuItems: [
-      drink('Mineralwasser still', { icon: '/icons/water_still.png' }),
-      drink('Mineralwasser mit Kohlensäure', { icon: '/icons/water_sparkling.png' }),
+      drink('Mineral ohne', { icon: '/icons/water_still.png' }),
+      drink('Mineral mit', { icon: '/icons/water_sparkling.png' }),
       drink('Eistee Zitrone', { icon: '/icons/ice_tea.png' }),
       drink('Eistee Pfirsich', { icon: '/icons/ice_tea.png' }),
       drink('Rivella rot', { icon: '/icons/rivella_red.png' }),
       drink('Coca-Cola', { icon: '/icons/coca_cola.png' }),
+      drink('Coca-Cola Zero', { icon: '/icons/coca_cola_zero.png' }),
       drink('Apfelschorle', { icon: '/icons/schorle.png' }),
       drink('Citro', { icon: '/icons/citro.png' }),
-      drink('Orangina', { icon: '/icons/orangina.png' }),
-      drink('Sirup', { icon: '/icons/sirup.png' }),
+      drink('Holunder-Melisse', { icon: '/icons/holunder_melisse.png' }),
+      // drink('Orangina', { icon: '/icons/orangina.png' }),
+      //drink('Sirup', { icon: '/icons/sirup.png' }),
       drink('Kaffee', {
         variants: [{ price: 300 }],
         extras: ['rahm', 'zucker'],
@@ -158,7 +160,7 @@ const initialSeedData: InitialSeedData = [
     category: { name: 'Pizza' },
     menuItems: [
       pizza('Pizza Simpel', { price: 1000 }),
-      pizza('Pizza Waldboden', { price: 12 }),
+      pizza('Pizza Waldboden', { price: 1200 }),
       pizza('Pizza Vegiboden', { price: 1150 }),
       pizza('Pizza Salami', { price: 1100 }),
       pizza('Pizza Brännt Bianca', { price: 1000 }),
@@ -172,18 +174,10 @@ const initialSeedData: InitialSeedData = [
     menuItems: [
       crepe('Crêpe Natur', { price: 550 }),
       crepe('Crêpe Schinken und Käse', { price: 750 }),
-      crepe('Crêpe Zimt und Zucket', { price: 600 }),
+      crepe('Crêpe Zimt und Zucker', { price: 600 }),
       crepe('Crêpe Nutella', { price: 650 }),
       crepe('Crêpe Nutella und Banane', { price: 700 }),
       crepe('Crêpe Apfelmus', { price: 650 }),
-    ],
-  },
-
-  {
-    category: { name: 'Feuer' },
-    menuItems: [
-      // TODO: Check if this category is even needed
-      // No items
     ],
   },
 ];
@@ -193,67 +187,69 @@ const initialSeedData: InitialSeedData = [
 ////////////////
 
 export async function seedInitial() {
-  // Truncate all databases. Run in transaction to avoid FK failures
   await db.run(sql`PRAGMA foreign_keys = OFF`);
 
   try {
     await db.transaction(async tx => {
-      const truncate = async (table: Table) => {
-        await tx.delete(table);
-        await tx.run(sql`DELETE FROM sqlite_sequence WHERE name = '${table}';`);
-      };
-      await truncate(schema.categories);
-      await truncate(schema.menuItems);
-      await truncate(schema.menuItemVariants);
-      await truncate(schema.extras);
-    });
-  } finally {
-    await db.run(sql`PRAGMA foreign_keys = ON`);
-  }
+      // 1. Truncate existing tables safely
+      await tx.delete(schema.orderItemExtras);
+      await tx.delete(schema.orderItems);
+      await tx.delete(schema.payments);
+      await tx.delete(schema.bills);
+      await tx.delete(schema.orders);
+      await tx.delete(schema.menuItemExtras);
+      await tx.delete(schema.menuItemVariants);
+      await tx.delete(schema.menuItems);
+      await tx.delete(schema.categories);
+      await tx.delete(schema.extras);
 
-  // Insert all extras and save in map for use when inserting items
-  const extraIds = await db
-    .insert(schema.extras)
-    .values(Object.values(extrasMap))
-    .returning({ id: schema.extras.id })
-    .then(res => res.map(x => x.id));
-  // Compute map from seed extras key (e.g. "rahm") to the ID in the database
-  const extraKeyToId = Object.fromEntries(zip(Object.keys(extrasMap), extraIds));
+      try {
+        await tx.run(sql`DELETE FROM sqlite_sequence;`);
+      } catch {
+        // Ignored if sqlite_sequence does not exist
+      }
 
-  // Process categories, menuItems and menuItemVariants concurrently
-  await Promise.all(
-    initialSeedData.map(async ({ category, menuItems }) => {
-      // Insert category and extract ID
-      const [{ id: categoryId }] = await db
-        .insert(schema.categories)
-        .values(category)
-        .returning({ id: schema.categories.id });
+      // 2. Insert Extras
+      const insertedExtras = await tx
+        .insert(schema.extras)
+        .values(Object.values(extrasMap))
+        .returning({ id: schema.extras.id });
 
-      // Insert all menu items
-      await Promise.all(
-        menuItems.map(async ({ item, variants, extras }) => {
-          // Insert menu item
-          const [{ id: itemId }] = await db
+      const extraKeyToId = Object.fromEntries(
+        zip(
+          Object.keys(extrasMap),
+          insertedExtras.map(x => x.id)
+        )
+      );
+
+      // 3. Insert Categories and Items sequentially
+      for (const { category, menuItems } of initialSeedData) {
+        const [{ id: categoryId }] = await tx
+          .insert(schema.categories)
+          .values(category)
+          .returning({ id: schema.categories.id });
+
+        for (const { item, variants, extras } of menuItems) {
+          const [{ id: itemId }] = await tx
             .insert(schema.menuItems)
             .values({ ...item, categoryId })
             .returning({ id: schema.menuItems.id });
 
-          // Insert all variants (no need to return IDs)
-          await db
+          await tx
             .insert(schema.menuItemVariants)
             .values(variants.map(variant => ({ ...variant, itemId })));
 
-          // If no extras, we're done
-          if (!extras) return;
-
-          // Use the stored mapping from key => DB ID to insert extras
-          await db
-            .insert(schema.menuItemExtras)
-            .values(extras.map(extraKey => ({ extraId: extraKeyToId[extraKey], itemId })));
-        })
-      );
-    })
-  );
+          if (extras && extras.length > 0) {
+            await tx
+              .insert(schema.menuItemExtras)
+              .values(extras.map(extraKey => ({ extraId: extraKeyToId[extraKey], itemId })));
+          }
+        }
+      }
+    });
+  } finally {
+    await db.run(sql`PRAGMA foreign_keys = ON`);
+  }
 }
 
 export async function seedDev() {
@@ -269,7 +265,7 @@ export async function seedAll() {
     },
   ];
 
-  if (env.NODE_ENV == 'development') {
+  if (env.NODE_ENV === 'development') {
     seedPromises.push(async () => {
       console.info('Seeding development entities');
       await seedDev();
@@ -284,6 +280,5 @@ export async function seedAll() {
     } else {
       console.error('Error running seed script:', err);
     }
-    process.exit(1);
   });
 }

@@ -112,26 +112,36 @@ export const orders = sqliteTable('orders', {
 });
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
-  bill: one(bills),
+  bill: one(bills, { fields: [orders.orderNumber], references: [bills.orderNumber] }),
   items: many(orderItems),
 }));
 
 /**
- * An order item contains one menu item and the amount ordered by the customer.
+ * An order item contains one menu item, its chosen variant, and quantity.
  */
 export const orderItems = sqliteTable('order_item', {
+  id: int().primaryKey({ autoIncrement: true }),
   orderNumber: int()
     .notNull()
-    .references(() => orders.orderNumber),
+    .references(() => orders.orderNumber, { onDelete: 'cascade' }),
   menuItemId: int()
     .notNull()
     .references(() => menuItems.id),
+  variantId: int()
+    .notNull()
+    .references(() => menuItemVariants.id),
   amount: int().notNull().default(1),
+  unitPrice: int().notNull().default(0), // Total unit price in Rappen including extras
 });
 
-export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+export const orderItemsRelations = relations(orderItems, ({ one, many }) => ({
   order: one(orders, { fields: [orderItems.orderNumber], references: [orders.orderNumber] }),
   menuItem: one(menuItems, { fields: [orderItems.menuItemId], references: [menuItems.id] }),
+  variant: one(menuItemVariants, {
+    fields: [orderItems.variantId],
+    references: [menuItemVariants.id],
+  }),
+  extras: many(orderItemExtras),
 }));
 
 /**
@@ -168,11 +178,35 @@ export const payments = sqliteTable('payments', {
   receiptNumber: int()
     .notNull()
     .references(() => bills.receiptNumber),
-  method: text().notNull().$type<'cash' | 'twint' | 'coupon'>().default('cash'),
+  method: text()
+    .notNull()
+    .$type<'cash' | 'twint' | 'coupon' | 'voucher' | 'helfer' | 'card'>()
+    .default('cash'),
   amount: int().notNull(),
   tipAmount: int().notNull().default(0),
 });
 
 export const paymentsRelations = relations(payments, ({ one }) => ({
   bill: one(bills, { fields: [payments.receiptNumber], references: [bills.receiptNumber] }),
+}));
+
+/**
+ * Extras/toppings selected for a specific order item.
+ */
+export const orderItemExtras = sqliteTable('order_item_extras', {
+  id: int().primaryKey({ autoIncrement: true }),
+  orderItemId: int()
+    .notNull()
+    .references(() => orderItems.id, { onDelete: 'cascade' }),
+  extraId: int()
+    .notNull()
+    .references(() => extras.id),
+});
+
+export const orderItemExtrasRelations = relations(orderItemExtras, ({ one }) => ({
+  orderItem: one(orderItems, {
+    fields: [orderItemExtras.orderItemId],
+    references: [orderItems.id],
+  }),
+  extra: one(extras, { fields: [orderItemExtras.extraId], references: [extras.id] }),
 }));

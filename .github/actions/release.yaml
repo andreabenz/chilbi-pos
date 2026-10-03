@@ -1,0 +1,145 @@
+name: Release Windows
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-windows:
+    name: Build & Release Windows App
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Version kommt aus "packageManager" in der Root-package.json
+      # (z. B. "packageManager": "pnpm@9.15.9"). Falls das Feld fehlt: `version: 9` ergänzen.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Verify tag matches package version
+        shell: bash
+        run: |
+          PKG_VERSION=$(node -p "require('./apps/pos/package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag ($TAG_VERSION) != apps/pos/package.json ($PKG_VERSION)"
+            exit 1
+          fi
+
+      - name: Check signing secrets
+        id: signing
+        shell: bash
+        env:
+          CSC_LINK_SECRET: ${{ secrets.WIN_CSC_LINK }}
+        run: |
+          if [ -n "$CSC_LINK_SECRET" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::WIN_CSC_LINK nicht gesetzt - Installer wird NICHT signiert (SmartScreen-Warnung beim Kunden)"
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter ceviwie-chilbi-pos lint
+
+      - name: Generate Drizzle migrations
+        run: pnpm --filter ceviwie-chilbi-pos db:generate
+
+      - name: Verify TypeScript types
+        run: pnpm --filter ceviwie-chilbi-pos typecheck
+
+      - name: Run unit tests
+        run: pnpm --filter ceviwie-chilbi-pos test:unit
+
+      # npmRebuild ist in der electron-builder.yml deaktiviert, daher hier explizit
+      - name: Rebuild native dependencies for Electron
+        run: pnpm --filter ceviwie-chilbi-pos run postinstall
+
+      - name: Build Windows Installer
+        run: pnpm --filter ceviwie-chilbi-pos build:win --publish never
+        env:
+          CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+
+      - name: Verify installer signature
+        if: steps.signing.outputs.enabled == 'true'
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem apps/pos/dist -Filter '*-setup.exe' | Select-Object -First 1
+          $sig = Get-AuthenticodeSignature $installer.FullName
+          Write-Host "Signatur: $($sig.Status) / $($sig.SignerCertificate.Subject)"
+          if ($sig.Status -ne 'Valid') { throw "Installer-Signatur ungueltig: $($sig.Status)" }
+
+      - name: Smoke test installer (silent install + file checks)
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem apps/pos/dist -Filter '*-setup.exe' | Select-Object -First 1
+          if (-not $installer) { throw 'Kein *-setup.exe in apps/pos/dist gefunden' }
+
+          $sizeMB = [math]::Round($installer.Length / 1MB, 1)
+          Write-Host "Installer: $($installer.Name) ($sizeMB MB)"
+          if ($sizeMB -lt 30) { throw "Installer verdaechtig klein ($sizeMB MB)" }
+
+          $dir = Join-Path $env:RUNNER_TEMP 'pos-install-test'
+          $p = Start-Process -FilePath $installer.FullName -ArgumentList '/S', "/D=$dir" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "Silent-Install fehlgeschlagen (ExitCode $($p.ExitCode))" }
+
+          $exe = Join-Path $dir 'ceviwie-chilbi-pos.exe'
+          foreach ($path in @($exe, (Join-Path $dir 'resources\app.asar'), (Join-Path $dir 'resources\drizzle'))) {
+            if (-not (Test-Path $path)) { throw "Fehlt nach Installation: $path" }
+          }
+
+          $sql = Get-ChildItem (Join-Path $dir 'resources\drizzle') -Recurse -Filter *.sql -ErrorAction SilentlyContinue
+          if (-not $sql) { throw 'Keine Drizzle-Migrationen (*.sql) im Installer' }
+
+          $native = Get-ChildItem (Join-Path $dir 'resources\app.asar.unpacked') -Recurse -Filter *.node -ErrorAction SilentlyContinue
+          if (-not $native) { throw 'Keine nativen .node-Dateien in app.asar.unpacked' }
+
+          Write-Host "OK: $($sql.Count) Migrationen, $($native.Count) native Module"
+          "INSTALL_DIR=$dir" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      # Startet die installierte App kurz und prüft, dass sie nicht sofort crasht.
+      # Nur Warnung, weil die App ohne Drucker/Hardware evtl. anders reagiert.
+      - name: Smoke test app startup
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $proc = Start-Process (Join-Path $env:INSTALL_DIR 'ceviwie-chilbi-pos.exe') -PassThru
+          Start-Sleep -Seconds 15
+          if ($proc.HasExited) { throw "App ist beim Start abgestuerzt (ExitCode $($proc.ExitCode))" }
+          Write-Host 'App laeuft nach 15s noch'
+          taskkill /F /T /PID $proc.Id
+
+      - name: Create GitHub Release and Upload Installer
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            apps/pos/dist/*-setup.exe
+            apps/pos/dist/*-setup.exe.blockmap
+            apps/pos/dist/latest.yml

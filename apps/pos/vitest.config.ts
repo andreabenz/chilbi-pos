@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { defineConfig, mergeConfig } from 'vitest/config';
 import electronViteConfig from './electron.vite.config';
 
@@ -23,6 +24,7 @@ export default defineConfig({
         },
       }),
       mergeConfig((electronViteConfig.renderer || {}) as Record<string, any>, {
+        publicDir: resolve(__dirname, 'src/renderer/public'),
         test: {
           name: 'renderer',
           environment: 'jsdom',

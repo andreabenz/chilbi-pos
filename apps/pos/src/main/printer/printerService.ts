@@ -77,6 +77,7 @@ export class PrinterService {
     let text = '';
     for (let i = 0; i < data.length; i++) {
       const byte = data[i];
+      if (byte === undefined) continue;
       if (byte === 0x0a) {
         text += '\n';
       } else if (byte >= 0x20 && byte <= 0x7e) {

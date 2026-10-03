@@ -1,7 +1,5 @@
 import { app, dialog, ipcMain } from 'electron';
-import { desc } from 'drizzle-orm';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import { desc, sql } from 'drizzle-orm';
 import { db } from '../db';
 import * as schema from '../db/schema';
 import { wipeAndResetDatabase } from '@main/db/services/adminService';
@@ -12,12 +10,6 @@ export function registerAdminIpc(): void {
    */
   ipcMain.handle('admin:export-db', async () => {
     try {
-      const dbUrl = process.env.DB_FILE_NAME || 'file:chilbi.db';
-      const rawFileName = dbUrl.startsWith('file:') ? dbUrl.slice(5) : dbUrl;
-      const sourceDbPath = path.isAbsolute(rawFileName)
-        ? rawFileName
-        : path.resolve(process.cwd(), rawFileName);
-
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
       const { canceled, filePath } = await dialog.showSaveDialog({
         title: 'Datenbank exportieren',
@@ -32,14 +24,15 @@ export function registerAdminIpc(): void {
         return { success: false, message: 'Abgebrochen' };
       }
 
-      await fs.copyFile(sourceDbPath, filePath);
+      const escapedPath = filePath.replace(/'/g, "''");
+      await db.run(sql.raw(`VACUUM INTO '${escapedPath}'`));
+
       return { success: true, path: filePath };
     } catch (error) {
       console.error('[AdminIPC] DB Export failed:', error);
       return { success: false, error: String(error) };
     }
   });
-
   /**
    * Fetch the latest 20 database entries with all joined relations
    */
@@ -57,6 +50,12 @@ export function registerAdminIpc(): void {
           items: {
             with: {
               menuItem: true,
+              variant: true,
+              extras: {
+                with: {
+                  extra: true,
+                },
+              },
             },
           },
         },

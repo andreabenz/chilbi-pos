@@ -57,6 +57,7 @@
     "@ceviwie/chilbi-shared": "workspace:*",
     "@lastapp/node-printer": "^0.8.0",
     "@libsql/client": "^0.15.15",
+    "libsql": "^0.5.22",
     "@primeuix/themes": "^1.2.5",
     "@t3-oss/env-core": "^0.13.8",
     "@tailwindcss/vite": "^4.1.17",
@@ -66,5 +67,15 @@
     "primevue": "^4.5.0",
     "sharp": "^0.35.4",
     "zod": "^4.1.13"
+  },
+  "optionalDependencies": {
+    "@img/sharp-win32-x64": "^0.35.4",
+    "@img/sharp-linux-x64": "^0.35.4",
+    "@img/sharp-darwin-arm64": "^0.35.4",
+    "@img/sharp-darwin-x64": "^0.35.4",
+    "@libsql/win32-x64-msvc": "^0.5.22",
+    "@libsql/linux-x64-gnu": "^0.5.22",
+    "@libsql/darwin-arm64": "^0.5.22",
+    "@libsql/darwin-x64": "^0.5.22"
   }
 }

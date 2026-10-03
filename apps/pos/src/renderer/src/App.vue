@@ -2,6 +2,7 @@
 import { Divider } from 'primevue';
 import NavBar from './components/NavBar.vue';
 import Sidebar from './components/Sidebar.vue';
+import ErrorDialog from '@/components/ErrorDialog.vue';
 </script>
 
 <template>
@@ -18,6 +19,7 @@ import Sidebar from './components/Sidebar.vue';
       <RouterView />
     </div>
   </div>
+  <ErrorDialog />
 </template>
 
 <style scoped>

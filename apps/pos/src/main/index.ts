@@ -1,6 +1,6 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import 'dotenv/config';
-import { app, BrowserWindow, globalShortcut, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, globalShortcut, ipcMain, shell } from 'electron';
 import { join } from 'node:path';
 import icon from '../../resources/icon.png?asset';
 import { seedAll } from './db/seed';
@@ -8,6 +8,7 @@ import { registerAllIpc } from './ipc';
 import { initPrinterLogo } from '../main/printer';
 import { categories } from '@main/db/schema';
 import { db } from '@main/db';
+import { runMigrations } from '@main/db/migrator';
 
 /**
  * Creates and configures the main Electron browser window in kiosk mode.
@@ -70,11 +71,26 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  // Run seeds and migrations (and await, we don't want to start executing stuff if this is not yet
-  // initialized)
-  const existing = await db.select().from(categories).limit(1);
-  if (existing.length === 0) {
-    await seedAll();
+  try {
+    await runMigrations();
+  } catch (err) {
+    console.error('[Database] Migration failed:', err);
+    dialog.showErrorBox(
+      'Datenbankfehler',
+      `Die Datenbank-Initialisierung ist fehlgeschlagen:\n\n${err instanceof Error ? err.message : String(err)}`
+    );
+    app.quit();
+    return;
+  }
+
+  try {
+    const existing = await db.select().from(categories).limit(1);
+    if (existing.length === 0) {
+      console.info('[Database] Empty database detected. Running initial seed...');
+      await seedAll();
+    }
+  } catch (err) {
+    console.error('[Database] Seeding check failed:', err);
   }
 
   // Register IPC endpoints
@@ -105,3 +121,15 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+process.on('uncaughtException', error => {
+  console.error('[Main Process Uncaught Exception]:', error);
+  dialog.showErrorBox(
+    'Schwerwiegender Systemfehler',
+    `Die Kassen-Software hat einen Fehler festgestellt:\n\n${error.message}`
+  );
+});
+
+process.on('unhandledRejection', reason => {
+  console.error('[Main Process Unhandled Rejection]:', reason);
+});

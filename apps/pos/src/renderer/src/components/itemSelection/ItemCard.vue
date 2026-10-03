@@ -14,12 +14,10 @@ const props = defineProps<{
 const cartStore = useCartStore();
 
 const isMultiVariant = computed(() => props.item.variants.length > 1);
-
-const minPrice = computed(() => {
+computed(() => {
   if (!props.item.variants || props.item.variants.length === 0) return 0;
   return Math.min(...props.item.variants.map(variant => variant.price));
 });
-
 const emit = defineEmits<{
   selectVariant: [item: MenuItem];
 }>();
@@ -35,6 +33,10 @@ function handleCardClick() {
     emit('selectVariant', props.item);
   }
 }
+function resolveIcon(url?: string | null): string | undefined {
+  if (!url) return undefined;
+  return `${import.meta.env.BASE_URL}${url.replace(/^\//, '')}`;
+}
 </script>
 
 <template>
@@ -46,7 +48,7 @@ function handleCardClick() {
       <div class="flex justify-center items-center">
         <img
           v-if="item.iconUrl"
-          :src="item.iconUrl"
+          :src="resolveIcon(item.iconUrl)"
           :alt="item.name"
           class="w-20 h-20 object-contain"
         />

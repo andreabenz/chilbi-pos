@@ -1,10 +1,14 @@
+// apps/pos/src/main/db/services/orderService.ts
 import { db } from '../index';
 import * as schema from '../schema';
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, sql, inArray } from 'drizzle-orm';
 
 export interface CreateOrderItemInput {
   menuItemId: number;
+  variantId: number;
   amount: number;
+  unitPrice?: number;
+  extraIds?: number[]; // Array of selected extra IDs
 }
 
 export interface CreatePaymentInput {
@@ -26,7 +30,7 @@ export interface OrderResult {
 }
 
 /**
- * Creates an order, bill, order items, and payment entries in a single transaction
+ * Creates an order, bill, order items with variants and extras, and payment entries in a single transaction
  */
 export async function createOrder(input: CreateOrderInput): Promise<OrderResult> {
   return db.transaction(async tx => {
@@ -40,15 +44,29 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderResult>
       throw new Error('Failed to create order');
     }
 
-    // 2. Insert Order Items
+    // 2. Insert Order Items & their corresponding extras
     if (input.items.length > 0) {
-      await tx.insert(schema.orderItems).values(
-        input.items.map(item => ({
-          orderNumber: order.orderNumber,
-          menuItemId: item.menuItemId,
-          amount: item.amount,
-        }))
-      );
+      for (const item of input.items) {
+        const [insertedItem] = await tx
+          .insert(schema.orderItems)
+          .values({
+            orderNumber: order.orderNumber,
+            menuItemId: item.menuItemId,
+            variantId: item.variantId,
+            amount: item.amount,
+            unitPrice: item.unitPrice ?? 0,
+          })
+          .returning({ id: schema.orderItems.id });
+
+        if (insertedItem && item.extraIds && item.extraIds.length > 0) {
+          await tx.insert(schema.orderItemExtras).values(
+            item.extraIds.map(extraId => ({
+              orderItemId: insertedItem.id,
+              extraId: extraId,
+            }))
+          );
+        }
+      }
     }
 
     // 3. Insert Bill
@@ -95,7 +113,7 @@ export async function getLatestOrderNumber(): Promise<number> {
 }
 
 /**
- * Deletes the latest order and returns the deleted order number and the next order number.
+ * Deletes the latest order, its items, and its extras cleanly.
  */
 export async function deleteLatestOrder(): Promise<
   | { success: true; deletedOrderNumber: number; nextOrderNumber: number }
@@ -104,17 +122,26 @@ export async function deleteLatestOrder(): Promise<
   return db.transaction(async tx => {
     const latestOrder = await tx.query.orders.findFirst({
       orderBy: [desc(schema.orders.orderNumber)],
-      with: { bill: true },
+      with: { bill: true, items: true },
     });
 
     if (!latestOrder) {
       return { success: false as const, message: 'Keine Bestellungen vorhanden' };
     }
 
+    // Delete bill & payments
     if (latestOrder.bill) {
       const { receiptNumber } = latestOrder.bill;
       await tx.delete(schema.payments).where(eq(schema.payments.receiptNumber, receiptNumber));
       await tx.delete(schema.bills).where(eq(schema.bills.receiptNumber, receiptNumber));
+    }
+
+    // Delete order item extras & order items
+    const orderItemIds = latestOrder.items.map(i => i.id);
+    if (orderItemIds.length > 0) {
+      await tx
+        .delete(schema.orderItemExtras)
+        .where(inArray(schema.orderItemExtras.orderItemId, orderItemIds));
     }
 
     await tx
@@ -123,24 +150,24 @@ export async function deleteLatestOrder(): Promise<
 
     await tx.delete(schema.orders).where(eq(schema.orders.orderNumber, latestOrder.orderNumber));
 
-    await tx.run(
-      sql`UPDATE sqlite_sequence
-          SET seq = (SELECT COALESCE(MAX(${schema.orders.orderNumber}), 0) FROM ${schema.orders})
-          WHERE name = 'orders'`
-    );
-    await tx.run(
-      sql`UPDATE sqlite_sequence
-          SET seq = (SELECT COALESCE(MAX(${schema.bills.receiptNumber}), 0) FROM ${schema.bills})
-          WHERE name = 'bills'`
-    );
+    try {
+      await tx.run(
+        sql`UPDATE sqlite_sequence
+            SET seq = (SELECT COALESCE(MAX(${schema.orders.orderNumber}), 0) FROM ${schema.orders})
+            WHERE name = 'orders'`
+      );
+      await tx.run(
+        sql`UPDATE sqlite_sequence
+            SET seq = (SELECT COALESCE(MAX(${schema.bills.receiptNumber}), 0) FROM ${schema.bills})
+            WHERE name = 'bills'`
+      );
+    } catch {
+      // Ignored if sqlite_sequence does not exist
+    }
 
     const [row] = await tx
       .select({
-        max: sql<number>`COALESCE(MAX(
-        ${schema.orders.orderNumber}
-        ),
-        0
-        )`,
+        max: sql<number>`COALESCE(MAX(${schema.orders.orderNumber}), 0)`,
       })
       .from(schema.orders);
 

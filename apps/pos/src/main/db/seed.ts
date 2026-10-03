@@ -6,7 +6,7 @@
 
 import { zip } from '@ceviwie/chilbi-shared/utils';
 import { env } from '@root/env';
-import { DrizzleQueryError, sql, Table } from 'drizzle-orm';
+import { DrizzleQueryError, sql } from 'drizzle-orm';
 import { db } from '.';
 import * as schema from './schema';
 
@@ -187,67 +187,69 @@ const initialSeedData: InitialSeedData = [
 ////////////////
 
 export async function seedInitial() {
-  // Truncate all databases. Run in transaction to avoid FK failures
   await db.run(sql`PRAGMA foreign_keys = OFF`);
 
   try {
     await db.transaction(async tx => {
-      const truncate = async (table: Table) => {
-        await tx.delete(table);
-        await tx.run(sql`DELETE FROM sqlite_sequence WHERE name = '${table}';`);
-      };
-      await truncate(schema.categories);
-      await truncate(schema.menuItems);
-      await truncate(schema.menuItemVariants);
-      await truncate(schema.extras);
-    });
-  } finally {
-    await db.run(sql`PRAGMA foreign_keys = ON`);
-  }
+      // 1. Truncate existing tables safely
+      await tx.delete(schema.orderItemExtras);
+      await tx.delete(schema.orderItems);
+      await tx.delete(schema.payments);
+      await tx.delete(schema.bills);
+      await tx.delete(schema.orders);
+      await tx.delete(schema.menuItemExtras);
+      await tx.delete(schema.menuItemVariants);
+      await tx.delete(schema.menuItems);
+      await tx.delete(schema.categories);
+      await tx.delete(schema.extras);
 
-  // Insert all extras and save in map for use when inserting items
-  const extraIds = await db
-    .insert(schema.extras)
-    .values(Object.values(extrasMap))
-    .returning({ id: schema.extras.id })
-    .then(res => res.map(x => x.id));
-  // Compute map from seed extras key (e.g. "rahm") to the ID in the database
-  const extraKeyToId = Object.fromEntries(zip(Object.keys(extrasMap), extraIds));
+      try {
+        await tx.run(sql`DELETE FROM sqlite_sequence;`);
+      } catch {
+        // Ignored if sqlite_sequence does not exist
+      }
 
-  // Process categories, menuItems and menuItemVariants concurrently
-  await Promise.all(
-    initialSeedData.map(async ({ category, menuItems }) => {
-      // Insert category and extract ID
-      const [{ id: categoryId }] = await db
-        .insert(schema.categories)
-        .values(category)
-        .returning({ id: schema.categories.id });
+      // 2. Insert Extras
+      const insertedExtras = await tx
+        .insert(schema.extras)
+        .values(Object.values(extrasMap))
+        .returning({ id: schema.extras.id });
 
-      // Insert all menu items
-      await Promise.all(
-        menuItems.map(async ({ item, variants, extras }) => {
-          // Insert menu item
-          const [{ id: itemId }] = await db
+      const extraKeyToId = Object.fromEntries(
+        zip(
+          Object.keys(extrasMap),
+          insertedExtras.map(x => x.id)
+        )
+      );
+
+      // 3. Insert Categories and Items sequentially
+      for (const { category, menuItems } of initialSeedData) {
+        const [{ id: categoryId }] = await tx
+          .insert(schema.categories)
+          .values(category)
+          .returning({ id: schema.categories.id });
+
+        for (const { item, variants, extras } of menuItems) {
+          const [{ id: itemId }] = await tx
             .insert(schema.menuItems)
             .values({ ...item, categoryId })
             .returning({ id: schema.menuItems.id });
 
-          // Insert all variants (no need to return IDs)
-          await db
+          await tx
             .insert(schema.menuItemVariants)
             .values(variants.map(variant => ({ ...variant, itemId })));
 
-          // If no extras, we're done
-          if (!extras) return;
-
-          // Use the stored mapping from key => DB ID to insert extras
-          await db
-            .insert(schema.menuItemExtras)
-            .values(extras.map(extraKey => ({ extraId: extraKeyToId[extraKey], itemId })));
-        })
-      );
-    })
-  );
+          if (extras && extras.length > 0) {
+            await tx
+              .insert(schema.menuItemExtras)
+              .values(extras.map(extraKey => ({ extraId: extraKeyToId[extraKey], itemId })));
+          }
+        }
+      }
+    });
+  } finally {
+    await db.run(sql`PRAGMA foreign_keys = ON`);
+  }
 }
 
 export async function seedDev() {
@@ -263,7 +265,7 @@ export async function seedAll() {
     },
   ];
 
-  if (env.NODE_ENV == 'development') {
+  if (env.NODE_ENV === 'development') {
     seedPromises.push(async () => {
       console.info('Seeding development entities');
       await seedDev();
@@ -278,6 +280,5 @@ export async function seedAll() {
     } else {
       console.error('Error running seed script:', err);
     }
-    process.exit(1);
   });
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Dialog, Button } from 'primevue';
-import { useCartStore } from '@/stores/cart';
+import { useCartStore } from '../../stores/cart.ts';
+import { useErrorStore } from '../../stores/error';
 import PaymentMethodSelector, {
   type DiscountType,
   type PaymentMethod,
@@ -11,6 +12,7 @@ import CheckoutSummary from './CheckoutSummary.vue';
 import TouchKeypad from './TouchKeypad.vue';
 
 const cartStore = useCartStore();
+const errorStore = useErrorStore();
 
 const visible = ref(false);
 const isSubmitting = ref(false);
@@ -165,79 +167,93 @@ async function handleSubmit() {
   if (!isOrderValid.value || isSubmitting.value) return;
   isSubmitting.value = true;
 
-  const payments: {
-    method: 'cash' | 'card' | 'voucher' | 'helfer' | 'coupon';
-    amount: number;
-    tipAmount?: number;
-  }[] = [];
-
-  if (discountType.value === 'helfer') {
-    payments.push({ method: 'helfer', amount: cartStore.subTotal });
-    if (tipAmount.value > 0) {
-      payments.push({ method: paymentMethod.value, amount: 0, tipAmount: tipAmount.value });
-    }
-  } else if (discountType.value === 'voucher') {
-    const voucherVal = cartStore.voucherDiscount;
-    if (voucherVal > 0) {
-      payments.push({ method: 'voucher', amount: voucherVal });
-    }
-    if (totalDue.value > 0 || tipAmount.value > 0) {
-      payments.push({
-        method: paymentMethod.value,
-        amount: totalDue.value,
-        tipAmount: tipAmount.value,
-      });
-    }
-  } else if (discountType.value === 'coupon') {
-    const couponVal = cartStore.couponDiscount;
-    if (couponVal > 0) {
-      payments.push({ method: 'coupon', amount: couponVal });
-    }
-    if (totalDue.value > 0 || tipAmount.value > 0) {
-      payments.push({
-        method: paymentMethod.value,
-        amount: totalDue.value,
-        tipAmount: tipAmount.value,
-      });
-    }
-  } else {
-    payments.push({
-      method: paymentMethod.value,
-      amount: totalDue.value,
-      tipAmount: tipAmount.value,
-    });
-  }
-
   try {
-    const result = await window.api.createOrder({
+    const payments: {
+      method: 'cash' | 'card' | 'voucher' | 'helfer' | 'coupon';
+      amount: number;
+      tipAmount?: number;
+    }[] = [];
+
+    if (discountType.value === 'helfer') {
+      payments.push({ method: 'helfer', amount: cartStore.subTotal });
+      if (tipAmount.value > 0) {
+        payments.push({ method: paymentMethod.value, amount: 0, tipAmount: tipAmount.value });
+      }
+    } else if (discountType.value === 'voucher') {
+      const voucherVal = cartStore.voucherDiscount;
+      if (voucherVal > 0) {
+        payments.push({ method: 'voucher', amount: voucherVal });
+      }
+      if (totalDue.value > 0 || tipAmount.value > 0) {
+        payments.push({
+          method: paymentMethod.value,
+          amount: totalDue.value,
+          tipAmount: tipAmount.value,
+        });
+      }
+    } else if (discountType.value === 'coupon') {
+      const couponVal = cartStore.couponDiscount;
+      if (couponVal > 0) {
+        payments.push({ method: 'coupon', amount: couponVal });
+      }
+      if (totalDue.value > 0 || tipAmount.value > 0) {
+        payments.push({
+          method: paymentMethod.value,
+          amount: totalDue.value,
+          tipAmount: tipAmount.value,
+        });
+      }
+    } else {
+      payments.push({
+        method: paymentMethod.value,
+        amount: totalDue.value,
+        tipAmount: tipAmount.value,
+      });
+    }
+
+    const orderPayload = {
       items: cartStore.items.map(item => ({
         menuItemId: item.menuItemId,
+        variantId: item.variant.id,
         amount: item.quantity,
-      })),
-      payments,
-    });
-
-    await window.api.printOrder({
-      orderNumber: result.orderNumber,
-      receiptNumber: result.receiptNumber,
-      items: cartStore.items.map(item => ({
-        name: item.name,
-        categoryName: item.categoryName,
-        variantName: item.variant?.name ?? null,
-        quantity: item.quantity,
         unitPrice: item.unitPrice,
-        extras: item.extras.map(e => ({ id: e.id, name: e.name, price: e.price })),
+        extraIds: item.extras.map(extra => extra.id),
       })),
-      subtotal: cartStore.subTotal,
-      discount: discountAmount.value,
-      finalTotal: totalDueWithTip.value,
-      paymentMethod: discountType.value === 'helfer' ? 'helfer' : paymentMethod.value,
-    });
+      payments: payments,
+    };
+
+    const result = await window.api.createOrder(orderPayload);
+
+    try {
+      await window.api.printOrder({
+        orderNumber: result.orderNumber,
+        receiptNumber: result.receiptNumber,
+        items: cartStore.items.map(item => ({
+          name: item.name,
+          categoryName: item.categoryName,
+          variantName: item.variant?.name ?? null,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          extras: item.extras.map(e => ({ id: e.id, name: e.name, price: e.price })),
+        })),
+        subtotal: cartStore.subTotal,
+        discount: discountAmount.value,
+        finalTotal: totalDueWithTip.value,
+        paymentMethod: discountType.value === 'helfer' ? 'helfer' : paymentMethod.value,
+      });
+    } catch (printErr) {
+      console.warn('[CheckoutDialog] Printing receipt failed non-fatally:', printErr);
+    }
 
     visible.value = false;
     emit('order-created', result);
   } catch (error) {
     console.error('Failed to create order:', error);
+    errorStore.showError(
+      'Bestellung fehlgeschlagen',
+      'Die Bestellung konnte nicht in der Datenbank gespeichert werden. Bitte überprüfe die Eingabe oder wende dich an den Admin.',
+      error
+    );
   } finally {
     isSubmitting.value = false;
   }

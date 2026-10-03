@@ -50,6 +50,11 @@ function isSelected(extraId: number) {
   return selectedExtraIds.value.includes(extraId);
 }
 
+function resolveIcon(url?: string | null): string | undefined {
+  if (!url) return undefined;
+  return `${import.meta.env.BASE_URL}${url.replace(/^\//, '')}`;
+}
+
 defineExpose({ open });
 </script>
 
@@ -83,7 +88,7 @@ defineExpose({ open });
       >
         <img
           v-if="extra.iconUrl"
-          :src="extra.iconUrl"
+          :src="resolveIcon(extra.iconUrl)"
           :alt="extra.name"
           class="h-12 w-12 object-contain"
         />

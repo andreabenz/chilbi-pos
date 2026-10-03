@@ -11,7 +11,8 @@ import * as schema from '../schema';
  * @returns Path to the newly created backup file
  */
 async function createBackup(): Promise<string> {
-  const backupDir = path.join(app.getPath('userData'), 'backups');
+  const basePath = typeof app?.getPath === 'function' ? app.getPath('userData') : process.cwd();
+  const backupDir = path.join(basePath, 'backups');
   fs.mkdirSync(backupDir, { recursive: true });
 
   const backupPath = path.join(backupDir, `pos-backup-${Date.now()}.db`);
@@ -36,6 +37,7 @@ export async function wipeAndResetDatabase(): Promise<{ backupPath: string }> {
     await db.transaction(async tx => {
       await tx.delete(schema.payments);
       await tx.delete(schema.bills);
+      await tx.delete(schema.orderItemExtras);
       await tx.delete(schema.orderItems);
       await tx.delete(schema.menuItemExtras);
       await tx.delete(schema.menuItemVariants);
@@ -45,7 +47,11 @@ export async function wipeAndResetDatabase(): Promise<{ backupPath: string }> {
       await tx.delete(schema.orders);
       await tx.delete(schema.users);
 
-      await tx.run(sql`DELETE FROM sqlite_sequence;`);
+      try {
+        await tx.run(sql`DELETE FROM sqlite_sequence;`);
+      } catch {
+        // Ignored if sqlite_sequence table does not exist yet
+      }
     });
   } finally {
     await db.run(sql`PRAGMA foreign_keys = ON;`);

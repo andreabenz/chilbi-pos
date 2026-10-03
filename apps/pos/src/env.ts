@@ -7,7 +7,7 @@ export const env = createEnv({
     /**
      * Database file name. Must be a valid SQLite URI.
      */
-    DB_FILE_NAME: z.url(),
+    DB_FILE_NAME: z.string().default('file:chilbi.db'),
   },
 
   /**

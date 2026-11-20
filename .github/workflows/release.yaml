@@ -62,7 +62,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm --filter ceviwie-chilbi-pos lint
+        run: pnpm lint
 
       - name: Generate Drizzle migrations
         run: pnpm --filter ceviwie-chilbi-pos db:generate

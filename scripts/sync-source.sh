@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Configuration: Files to sync between packages/pos and packages/butler
+# Configuration: Files to sync between apps/pos and apps/butler
 SYNC_FILES=(
     "electron.vite.config.ts"
     "tsconfig.json"
@@ -12,8 +12,8 @@ SYNC_FILES=(
     "src/renderer/src/main.ts"
 )
 
-POS_DIR="packages/pos"
-BUTLER_DIR="packages/butler"
+POS_DIR="apps/pos"
+BUTLER_DIR="apps/butler"
 
 # Color output
 RED='\033[0;31m'

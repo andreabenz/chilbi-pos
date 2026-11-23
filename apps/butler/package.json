@@ -31,7 +31,7 @@
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
     "autoprefixer": "^10.4.22",
-    "electron": "^38.1.2",
+    "electron": "catalog:",
     "electron-builder": "^26.0.12",
     "electron-vite": "^4.0.1",
     "jsdom": "^27.2.0",

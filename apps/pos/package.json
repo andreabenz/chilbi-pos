@@ -35,7 +35,7 @@
     "@vue/tsconfig": "^0.8.1",
     "autoprefixer": "^10.4.22",
     "drizzle-kit": "^0.31.7",
-    "electron": "^38.7.2",
+    "electron": "catalog:",
     "electron-builder": "^26.0.12",
     "electron-vite": "^4.0.1",
     "jsdom": "^27.2.0",

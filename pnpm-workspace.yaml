@@ -6,3 +6,6 @@ onlyBuiltDependencies:
   - electron
   - electron-winstaller
   - esbuild
+
+catalog:
+  electron: 38.7.2
